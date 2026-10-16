@@ -61,5 +61,7 @@ consoles (the rooftop / lot)
 - **CP9 — OasisAI:** same passport, registry, memory and ledger.
 
 Research base: `C:/Users/wirec/abuz8-mission/logs/consoleai-ten-systems-full-reverse-report.html`
+Parity target: [docs/KYLON-PARITY-SPEC.md](docs/KYLON-PARITY-SPEC.md) — the Kylon-class room/App shell
+plus the nine learned superfeatures this repo must grow into next.
 
 Contact: support@abuz8ai.com
