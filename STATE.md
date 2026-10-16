@@ -103,8 +103,7 @@ nothing copied from Kylon's branding, text, assets or source.
   (test ledger only), no background scheduler/webhook runner, no OAuth connection flows
   (registry + grants only), no public anonymous App pages, no file-upload storage,
   derived Agent Books + metals live in the Platform tab (real rows only; market pricing open), no marketplace (CP8), no mobile/desktop apps, console
-  hard-delete still needs child-first ordering. Supabase Auth redirect allowlist may
-  need the online URLs added in the dashboard for magic links.
+  hard-delete still needs child-first ordering. Auth redirect allowlist is set via CLI (see lock-in section); first owner sign-in is still owed.
 
 ## Real frontend + backend — DEPLOYED ONLINE (same evening, CHO: "build the real front end and back end")
 
@@ -132,6 +131,34 @@ nothing copied from Kylon's branding, text, assets or source.
 - Still unproven: any signed-in dispatch through the server runner (needs the
   first real user), callback/run-due/public-App happy paths (need the secrets),
   Stripe, OAuth flows, market pricing/marketplace.
+
+## Supabase CLI lock-in — AMANECER CONTROLS THE PLATFORM (2026-10-16 night, CHO order)
+
+- Supabase CLI **v2.121.0** installed globally via npm (`AppData\Roaming
+pm\supabase`;
+  winget has no Supabase package on this box). Owner supplied an access token and
+  `supabase login --name amanecer-consoleai` returned **"You are now logged in."**
+  Token values were never printed, committed, or stored anywhere except the CLI's
+  own local credential store. A token shared in chat should be rotated via
+  `LOCK-IN-SUPABASE.bat` (repo root + Desktop) and the old one revoked.
+- Fresh-shell proof: `supabase projects list` shows `consoleai`
+  (`fetsmubjgyzsuwiubepj`, org `ulnsumhkteeyvnftscok`, ACTIVE_HEALTHY);
+  `supabase link` set `linked:true` with no DB password needed.
+- **Auth URLs FIXED via CLI** (`config pull` revealed remote Site URL was
+  `http://localhost:3000` with zero redirect URLs): `supabase/config.toml`
+  (pulled remote config, only two properties changed, secret scan = only
+  `env(...)` refs) now sets Site URL `https://oasis.abuz8ai.com` + redirects
+  oasis/pages.dev/backend-preview/127.0.0.1:8000/localhost:3000.
+  `config diff` showed exactly those 2 updates; `config push` exit 0;
+  diff afterwards = **"No config differences found"**. Magic links should now
+  land back on oasis — first sign-in still creates the first user.
+- **Migration ledger reconciled:** local files renamed to their remote
+  timestamp versions (`20261016180122_consoleai_foundation.sql` …
+  `20261016211231_file_storage.sql`). `migration list` = 9/9 matched pairs;
+  `db push --linked --dry-run` = `{"upToDate":true}`. Future migrations are
+  safe to ship from the CLI. Operator map: `docs/BACKEND.md`.
+- Committed with this state: `supabase/config.toml`, `supabase/.gitignore`
+  (.temp ignored), `LOCK-IN-SUPABASE.bat`, renamed migrations.
 
 ## Not built yet — do not claim
 

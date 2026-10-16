@@ -43,10 +43,39 @@ deployment picks it up, then re-check `/api/health` — the matching flag flips
 to `true`. Secrets are write-only in Cloudflare; rotating one means pasting a
 new value in every place listed above.
 
-Also still owner-only in Supabase Auth: Authentication → URL Configuration →
-Site URL `https://oasis.abuz8ai.com`, Redirect URLs
-`https://oasis.abuz8ai.com/**` and `https://consoleai-abuz8.pages.dev/**`,
-then sign in once to create the owner account.
+## Supabase control plane (Amanecer, via Supabase CLI)
+
+The Supabase CLI (v2.121.0, global npm install) is logged in on this machine
+as the project owner and the repo is linked to project
+`fetsmubjgyzsuwiubepj`. Day-to-day platform control is CLI-first now, no
+dashboard errands:
+
+```bash
+supabase projects list        # account control proof
+supabase migration list       # local files == remote history (9/9 matched)
+supabase db push --dry-run    # "Remote database is up to date" when in sync
+supabase config pull|diff|push
+```
+
+Auth URL configuration was set through the CLI on 2026-10-16 (verified by a
+zero-diff afterwards): Site URL `https://oasis.abuz8ai.com`; redirect
+allowlist `https://oasis.abuz8ai.com/**`,
+`https://consoleai-abuz8.pages.dev/**`,
+`https://backend-preview.consoleai-abuz8.pages.dev/**`,
+`http://127.0.0.1:8000/**`, `http://localhost:3000/**`. The committed
+`supabase/config.toml` is the pulled remote config with only those two Auth
+properties changed; every secret-shaped value in it is an `env(...)` reference.
+
+Local migration files carry their remote timestamp versions
+(`20261016..._name.sql`) so `db push` never tries to re-apply history.
+New migrations: `supabase migration new <name>` → edit SQL → proof →
+`supabase db push` (or the Supabase MCP, keeping versions in step).
+
+**Token hygiene:** CLI access tokens are account-level keys. Never paste one
+in chat. Lock-in/rotation that keeps chat clean: run `LOCK-IN-SUPABASE.bat`
+(repo root or Desktop), create/approve the token in the browser, paste it
+only into that console window, then revoke the old token at
+Supabase → Account → Access Tokens.
 
 ## Dispatch, two ways
 
