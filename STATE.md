@@ -69,9 +69,10 @@ nothing copied from Kylon's branding, text, assets or source.
 
 - **Online front door (new, separate from abuz8ai.com):** Cloudflare Pages project
   `consoleai-abuz8` → https://consoleai-abuz8.pages.dev (HTTP 200, headless DOM
-  "Backend reachable. Signed out"). Custom domain `oasis.abuz8ai.com`: DNS CNAME
-  created and Pages domain added (status was `initializing`, certificate pending
-  at attach time) — re-verify HTTPS before calling it live.
+  "Backend reachable. Signed out"). **`oasis.abuz8ai.com` is LIVE** (verified
+  2026-10-16 evening): Pages domain status `active` (verification + validation
+  active, Google cert), HTTPS curl 200, headless DOM on the subdomain itself =
+  "Backend reachable. Signed out", screenshot `docs/cp45-online-render.png`.
 - Migrations applied remotely: `room_apps`, `verify_fund_platform`, `fk_indexes2`,
   `cascade_trigger_fix`. Public schema is now **25 RLS tables**: the CP1–CP3 twelve plus
   apps/app_records/app_links/app_views, stips/verify_checks/approvals, credit_ledger,
