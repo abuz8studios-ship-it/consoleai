@@ -80,7 +80,7 @@ The parity build adds, in order:
 - [ ] Handoff passes jacket + thread brief + records to a second agent.
 - [ ] Invite a second human; private agent remains invisible until explicitly shared.
 - [ ] Publish flow produces a shareable App URL under our domain.
-- [ ] Jacket cannot reach funded until required stips/checks pass.
+- [x] Jacket cannot reach funded until required stips/checks pass. *(SQL-proven 2026-10-16: `CP4_CP45_RLS_PROOF_PASS`)*
 - [ ] Every run exposes cost estimate, actual run steps, output and evidence.
 
 ## 5. Build sequence from the current working floor
@@ -102,7 +102,17 @@ The parity build adds, in order:
 
 - Done: CP1 identity/RLS; CP2 agent registry/probes; CP3 rooms/members/threads/messages/
   jackets/webhook dispatch/handoffs/run steps — schema/UI proven; advisors clean.
-- Not done: room-first Kylon-class shell, inline record Apps, connected real endpoint in the UI,
-  integrations catalog, agent cloud computers/Live Desktop, credits/billing, mobile apps.
-- Local proof: `http://127.0.0.1:8000` while the dev server runs; render at `docs/cp23-render.png`.
-- Public door target: `oasis.abuz8ai.com` (CHO proposed; DNS/deployment not yet done).
+- Progress 2026-10-16 (online build): CP3.5 room shell deployed; CP4 Verify & Fund and
+  CP4.5 Room Apps plus approvals/test-credits/connections/automations/memories/files are
+  live in Postgres (25 RLS tables) and in the online UI at https://consoleai-abuz8.pages.dev.
+  Two-tenant SQL proof `CP4_CP45_RLS_PROOF_PASS` covers isolation, the funded invariant,
+  cross-tenant trigger blocks, the 3-fail breaker and credit idempotency (cleanup 0 rows).
+  Agent→App response contract implemented in the dispatch path.
+- Still NOT parity: no signed-in end-user journey recorded, no real endpoint has built an
+  App from the UI yet, no OAuth integrations catalog flows, no background scheduler/webhook
+  runner, no Stripe charging (test ledger only), no public anonymous App pages or upload
+  storage, no Books/metals or marketplace, no cloud computers/Live Desktop, no mobile apps.
+  Remaining checklist boxes above stay unchecked until a signed-in journey proves each one.
+- Local proof: `http://127.0.0.1:8000` while the dev server runs; online proof:
+  https://consoleai-abuz8.pages.dev (signed-out render + backend reachable).
+- Public door target: `oasis.abuz8ai.com` (DNS + Pages domain attached; verify HTTPS fresh).

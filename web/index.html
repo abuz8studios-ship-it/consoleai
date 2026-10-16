@@ -24,6 +24,14 @@ main{max-width:1500px;margin:0 auto;padding:22px}.grid{display:grid;grid-templat
 .composer{border-top:1px solid var(--line);padding-top:10px}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.tab{background:#17385d;color:var(--text);border:1px solid var(--line);padding:7px 10px}
 .tab.active{background:var(--gold);color:#111827}.insp-panel h3{margin-top:4px}
+.appcard{border:1px solid var(--teal);border-radius:12px;padding:12px;background:#0a2233;margin:6px 0}
+.boardcols{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(170px,1fr);gap:10px;overflow-x:auto;padding-bottom:6px}
+.boardcol{border:1px solid var(--line);border-radius:12px;padding:8px;background:#071527;min-height:80px}
+.boardcol h5{margin:2px 0 8px;color:var(--gold2);text-transform:capitalize}
+.rec{border:1px solid var(--line);border-radius:10px;padding:9px;margin:7px 0;background:#0a1b30}
+.kv{font-size:.85rem;color:var(--muted)} .kv b{color:var(--text)}
+table.rec-table{width:100%;border-collapse:collapse;font-size:.88rem} table.rec-table th,table.rec-table td{border-bottom:1px solid #1b3553;padding:6px;text-align:left;vertical-align:top}
+details.createbox{margin:10px 0}
 @media(max-width:1100px){.shell{grid-template-columns:1fr 1fr}.roompane{grid-column:1/-1;order:-1}.rail,.inspector{position:static;max-height:none}.workspace{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.proof{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.shell{grid-template-columns:1fr}}
 @media(max-width:760px){.workspace,.proof{grid-template-columns:1fr}main{padding:14px}}
@@ -31,7 +39,7 @@ main{max-width:1500px;margin:0 auto;padding:22px}.grid{display:grid;grid-templat
 </head>
 <body>
 <header>
-  <div class="brand">ABUZ8 · ConsoleAI CP3.5 slice 1 — room shell (not parity yet)</div>
+  <div class="brand">ABUZ8 · ConsoleAI online — rooms, Apps, Verify &amp; Fund (parity in progress)</div>
   <h1>People + agents.<br><em>One lot.</em></h1>
   <p class="sub">Register an agent passport, bring it into a multiplayer room, open a job jacket, dispatch real work to its endpoint, hand the result to the next agent, and keep every step as evidence. Payments stay locked until CP4's Verify &amp; Fund desk exists.</p>
   <div class="flow"><span>Sign up</span><i>→</i><span>Register agent</span><i>→</i><span>Room</span><i>→</i><span>Grants</span><i>→</i><span>Dispatch</span><i>→</i><span>Evidence</span><i>→</i><span>Verify (CP4)</span></div>
@@ -153,6 +161,9 @@ main{max-width:1500px;margin:0 auto;padding:22px}.grid{display:grid;grid-templat
           <button class="tab" data-insp="runs" type="button">Runs</button>
           <button class="tab" data-insp="members" type="button">Members</button>
           <button class="tab" data-insp="apps" type="button">Apps</button>
+          <button class="tab" data-insp="verify" type="button">Verify</button>
+          <button class="tab" data-insp="approvals" type="button">Approvals</button>
+          <button class="tab" data-insp="platform" type="button">Platform</button>
         </div>
         <div class="insp-panel" data-panel="jacket">
           <h3>Selected jacket</h3>
@@ -174,7 +185,95 @@ main{max-width:1500px;margin:0 auto;padding:22px}.grid{display:grid;grid-templat
         </div>
         <div class="insp-panel hidden" data-panel="apps">
           <h3>Room Apps</h3>
-          <div class="empty">No Apps yet — honestly. Inline record Apps are CP4.5: the <code>apps</code>/<code>app_records</code> tables do not exist in the database yet. In this slice, job jackets and run steps are the living records; nothing here is faked.</div>
+          <p class="muted">An App is a living record set inside the work: one App, linkable to many rooms/threads, edited in one place and current everywhere it is linked. Agents can also create one by returning an <code>app</code> object in their dispatch JSON (see the work-packet contract sent with every dispatch).</p>
+          <div class="row">
+            <button class="small secondary" data-template="tracker" type="button">Invoice tracker</button>
+            <button class="small secondary" data-template="board" type="button">Hiring board</button>
+            <button class="small secondary" data-template="dashboard" type="button">Pipeline dashboard</button>
+            <button class="small secondary" data-template="form_page" type="button">Floor count page</button>
+          </div>
+          <details class="createbox" id="appCreateBox"><summary>Create an App</summary>
+            <label for="appName">App name</label><input id="appName" placeholder="Invoice Tracker">
+            <label for="appSlug">Slug</label><input id="appSlug" placeholder="invoice-tracker">
+            <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
+              <div><label for="appKind">Kind</label><select id="appKind"><option value="tracker">Tracker (table)</option><option value="board">Board</option><option value="dashboard">Dashboard</option><option value="form_page">Form page</option><option value="custom">Custom</option></select></div>
+              <div><label for="appVisibility">Visibility</label><select id="appVisibility"><option value="room">Linked rooms</option><option value="console">Whole console</option><option value="private">Private to me/admins</option></select></div>
+            </div>
+            <label for="appFields">Fields (comma separated labels)</label><input id="appFields" placeholder="Client, Amount, Due date">
+            <label for="appDesc">Description</label><textarea id="appDesc" rows="2" placeholder="What records does this App keep current?"></textarea>
+            <div class="row" style="margin-top:12px"><button id="createAppBtn" type="button">Create App in selected room</button></div>
+          </details>
+          <div id="appList" style="margin-top:10px"></div>
+          <div id="appDetail" style="margin-top:12px"></div>
+        </div>
+        <div class="insp-panel hidden" data-panel="verify">
+          <h3>Verify &amp; Fund desk</h3>
+          <p class="muted">For the selected jacket. The database itself refuses <code>funded</code> until there is at least one required check, every required check is <b>pass</b>, and every required stip is satisfied.</p>
+          <div id="verifySummary" class="empty">Select a jacket.</div>
+          <div class="row" style="margin-top:10px"><button id="seedVerifyBtn" class="secondary" type="button">Add standard stip + check</button><button id="tryFundedBtn" type="button">Try move to funded</button></div>
+          <h3>Stips (evidence owed)</h3>
+          <label for="stipLabel">New stip</label><input id="stipLabel" placeholder="Signed acceptance from the client">
+          <div class="row" style="margin-top:8px"><button id="addStipBtn" class="secondary" type="button">Add required stip</button></div>
+          <div id="stipsList"></div>
+          <h3>Verification checks</h3>
+          <label for="checkLabel">New check</label><input id="checkLabel" placeholder="Output matches the acceptance criteria">
+          <label for="checkKind">Kind</label><select id="checkKind"><option value="evidence">Evidence</option><option value="acceptance">Acceptance</option><option value="output">Output</option><option value="budget">Budget</option><option value="identity">Identity</option><option value="custom">Custom</option></select>
+          <div class="row" style="margin-top:8px"><button id="addCheckBtn" class="secondary" type="button">Add required check</button></div>
+          <div id="checksList"></div>
+        </div>
+        <div class="insp-panel hidden" data-panel="approvals">
+          <h3>Approvals inbox</h3>
+          <p class="muted">One approval, one action. Publishing an App and funding a jacket route through here; external sends stay drafts until a human decides.</p>
+          <label for="approvalTitle">Request an approval</label><input id="approvalTitle" placeholder="Send the client update email">
+          <label for="approvalKind">Kind</label><select id="approvalKind"><option value="external_send">External send (draft)</option><option value="publish">Publish selected App</option><option value="fund">Fund selected jacket</option><option value="dispatch">Dispatch</option><option value="automation">Automation</option><option value="custom">Custom</option></select>
+          <div class="row" style="margin-top:8px"><button id="requestApprovalBtn" type="button">Request approval</button></div>
+          <div id="approvalsList" style="margin-top:10px"></div>
+        </div>
+        <div class="insp-panel hidden" data-panel="platform">
+          <h3>Credits</h3>
+          <div id="creditBalance" class="empty">No credit ledger yet.</div>
+          <p class="muted">Pooled per console, append-only, idempotent. These are <b>test ledger entries</b> — Stripe purchase is not wired, and failed/halted dispatches are never charged. When the ledger exists and hits zero, dispatch pauses.</p>
+          <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
+            <div><label for="creditAmount">Test grant (credits)</label><input id="creditAmount" type="number" min="1" value="100"></div>
+            <div><label for="creditNote">Note</label><input id="creditNote" placeholder="Founder test grant"></div>
+          </div>
+          <div class="row" style="margin-top:8px"><button id="addCreditBtn" class="secondary" type="button">Add test grant</button></div>
+          <div id="creditsList"></div>
+          <h3>Connections</h3>
+          <p class="muted">Register the accounts your agents may use and grant them per agent/room. Store a <b>vault reference only — never a raw secret</b>. Honest state: this records the grant; one-click OAuth into 3,000 services is not wired here yet.</p>
+          <label for="connName">Connection name</label><input id="connName" placeholder="Studio Gmail">
+          <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
+            <div><label for="connKind">Service</label><select id="connKind"><option value="gmail">Gmail</option><option value="outlook">Outlook</option><option value="slack">Slack</option><option value="teams">Microsoft Teams</option><option value="notion">Notion</option><option value="hubspot">HubSpot</option><option value="linear">Linear</option><option value="github">GitHub</option><option value="google_sheets">Google Sheets</option><option value="salesforce">Salesforce</option><option value="airtable">Airtable</option><option value="jira">Jira</option><option value="calendly">Calendly</option><option value="confluence">Confluence</option><option value="discord">Discord</option><option value="zoom">Zoom</option><option value="webhook">Webhook</option><option value="rest">REST API</option><option value="mcp">MCP server</option><option value="cli">CLI</option><option value="custom">Custom</option></select></div>
+            <div><label for="connStatus">Status</label><select id="connStatus"><option value="not_connected">Not connected</option><option value="connected">Connected (externally)</option><option value="paused">Paused</option><option value="error">Error</option></select></div>
+          </div>
+          <label for="connRef">Vault reference (never a secret)</label><input id="connRef" placeholder="vault:gmail-studio">
+          <div class="row" style="margin-top:8px"><button id="addConnBtn" class="secondary" type="button">Register connection</button></div>
+          <label for="grantAgent">Grant target agent</label><select id="grantAgent"></select>
+          <div id="connectionsList"></div>
+          <h3>Automations</h3>
+          <p class="muted">Definitions live here with a 3-fail circuit breaker in the database. <b>Run now</b> performs a real dispatch on the selected jacket. No background scheduler runs schedules/webhooks yet — recorded, not faked.</p>
+          <label for="autoName">Automation name</label><input id="autoName" placeholder="Monday invoice reminders">
+          <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
+            <div><label for="autoTrigger">Trigger</label><select id="autoTrigger"><option value="manual">Manual</option><option value="schedule">Schedule</option><option value="webhook">Webhook</option><option value="record_change">Record change</option></select></div>
+            <div><label for="autoCron">Schedule (cron text)</label><input id="autoCron" placeholder="0 9 * * MON"></div>
+          </div>
+          <label for="autoAgent">Agent</label><select id="autoAgent"></select>
+          <label for="autoInstructions">Instructions</label><textarea id="autoInstructions" rows="3" placeholder="Draft the reminders for overdue records. Drafts only — no sends without approval."></textarea>
+          <div class="row" style="margin-top:8px"><button id="createAutoBtn" class="secondary" type="button">Save automation (draft)</button></div>
+          <div id="autosList"></div>
+          <h3>Memory</h3>
+          <label for="memTitle">Title</label><input id="memTitle" placeholder="How this client likes reports">
+          <label for="memKind">Kind</label><select id="memKind"><option value="context">Context</option><option value="preference">Preference</option><option value="feedback">Feedback</option><option value="reference">Reference</option><option value="instruction">Instruction</option></select>
+          <label for="memBody">Body</label><textarea id="memBody" rows="3" placeholder="What the next person or agent must know…"></textarea>
+          <div class="row" style="margin-top:8px"><button id="addMemBtn" class="secondary" type="button">Save memory</button></div>
+          <div id="memoriesList"></div>
+          <h3>Files &amp; evidence</h3>
+          <p class="muted">Metadata + external link (file upload storage is not wired yet).</p>
+          <label for="fileName">Name</label><input id="fileName" placeholder="Signed acceptance PDF">
+          <label for="fileUrl">External URL (https)</label><input id="fileUrl" type="url" placeholder="https://…">
+          <label for="fileKind">Kind</label><select id="fileKind"><option value="evidence">Evidence</option><option value="output">Output</option><option value="attachment">Attachment</option><option value="other">Other</option></select>
+          <div class="row" style="margin-top:8px"><button id="addFileBtn" class="secondary" type="button">Attach link</button></div>
+          <div id="filesList"></div>
         </div>
       </aside>
     </div>
@@ -183,8 +282,8 @@ main{max-width:1500px;margin:0 auto;padding:22px}.grid{display:grid;grid-templat
   <section class="proof">
     <div><b>CP1 PROVEN</b>Identity, consoles, memberships and RLS tenant isolation.</div>
     <div><b>CP2 LIVE</b>Agent passports, endpoint registration and browser capability probes.</div>
-    <div><b>CP3.5 SLICE 1</b>Room-first shell: left rail, room timeline, @mention composer, right Jacket/Runs/Members/Apps inspector. Apps + verify/fund are CP4.5/CP4 — not built yet.</div>
-    <div><b>STILL LOCKED</b>Funding state is blocked in the database until CP4 verification exists. No silent OK gets paid.</div>
+    <div><b>CP4 + CP4.5 DB PROVEN</b>Room Apps with records, stips + verification checks, approvals, credit ledger, connections, automations, memories and files in Postgres with RLS. Two-tenant SQL proof passed and cleaned to zero.</div>
+    <div><b>FUNDING RULE</b>The database opens <code>funded</code> only when every required check passes and every required stip is satisfied. Stripe charging, a background scheduler, OAuth account connections and public anonymous App pages are NOT wired yet — nothing here pretends they are.</div>
   </section>
 </main>
 <footer>ConsoleAI by ABUZ8 LLC · Entry to OasisAI · support@abuz8ai.com</footer>
@@ -201,6 +300,9 @@ let selectedConsoleId = localStorage.getItem("consoleai_console_id") || "";
 let selectedRoomId = localStorage.getItem("consoleai_room_id") || "";
 let selectedThreadId = localStorage.getItem("consoleai_thread_id") || "";
 let selectedJacketId = localStorage.getItem("consoleai_jacket_id") || "";
+let apps = [], appRecords = [], appLinks = [], appViews = [], stips = [], checks = [], approvals = [], credits = [], connections = [], connGrants = [], automations = [], memories = [], filesListData = [];
+let selectedAppId = localStorage.getItem("consoleai_app_id") || "";
+let appViewKind = localStorage.getItem("consoleai_app_view") || "table";
 
 function say(msg, cls="") { statusEl.className = `status ${cls}`; statusEl.textContent = msg; }
 function slugify(v) { return String(v || "").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,63); }
@@ -231,7 +333,7 @@ function renderInspector() {
   if (ij) {
     const j=byId(jackets,selectedJacketId);
     ij.className = j ? "item" : "empty";
-    ij.innerHTML = j ? `<div class="item-head"><b>${esc(j.title)}</b><span class="pill gold">${esc(j.state)}</span></div><div class="muted">Budget cap ${j.budget_cap_credits} credits · ${esc(j.visibility)}${j.room_id?' · room anchored':' · no room anchor'}</div><p>${esc(j.brief||'No brief yet.')}</p>${j.acceptance_criteria?`<p><b>Acceptance:</b> ${esc(j.acceptance_criteria)}</p>`:''}<p class="muted">Funding stays locked until CP4 Verify &amp; Fund replaces the database reserve trigger with real passed checks.</p>` : 'Select a jacket in the left rail.';
+    ij.innerHTML = j ? `<div class="item-head"><b>${esc(j.title)}</b><span class="pill gold">${esc(j.state)}</span></div><div class="muted">Budget cap ${j.budget_cap_credits} credits · ${esc(j.visibility)}${j.room_id?' · room anchored':' · no room anchor'}</div><p>${esc(j.brief||'No brief yet.')}</p>${j.acceptance_criteria?`<p><b>Acceptance:</b> ${esc(j.acceptance_criteria)}</p>`:''}<p class="muted">Funding opens in the database only when every required CP4 check passes and every required stip is satisfied — see the Verify tab.</p>` : 'Select a jacket in the left rail.';
   }
   const im=$("#inspectorMembers");
   if (im) {
@@ -253,7 +355,11 @@ function renderMention() {
   const el=$("#mentionTarget"); if (!el) return;
   const raw=String($("#messageBody")?.value||"");
   const m=raw.match(/@([a-z0-9][a-z0-9-]*)/i);
-  if (!m) { el.textContent="No @agent targeted. Unnamed messages stay human messages; dispatch is explicit."; return; }
+  if (!m) {
+    const room=byId(rooms,selectedRoomId); const dflt=room?.default_agent_id?byId(agents,room.default_agent_id):null;
+    el.textContent = dflt ? `No @mention. Room default is @${dflt.slug} — type @${dflt.slug} (or any @agent-slug) to target dispatch explicitly.` : "No @agent targeted and this room has no default agent. Unnamed messages stay human messages; dispatch is explicit.";
+    return;
+  }
   const a=mentionAgent();
   if (!a) { el.textContent=`@${m[1].toLowerCase()} does not match any registered agent slug in this console. Check the left rail.`; return; }
   const inRoom=roomMembers.some(x=>x.agent_id===a.id);
@@ -267,6 +373,309 @@ function applyShellSearch() {
       el.style.display = (!q || el.textContent.toLowerCase().includes(q)) ? "" : "none";
     });
   });
+}
+
+
+function fieldKey(label){ return String(label||"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"").slice(0,40)||"field"; }
+function parseFields(v){
+  if (Array.isArray(v)) return v.map(f=> typeof f==="string" ? {key:fieldKey(f),label:String(f).slice(0,60),type:"text"} : {key:fieldKey(f.key||f.label||"field"),label:String(f.label||f.key||"Field").slice(0,60),type:String(f.type||"text").slice(0,20)}).slice(0,12);
+  return String(v||"").split(",").map(x=>x.trim()).filter(Boolean).map(label=>({key:fieldKey(label),label:label.slice(0,60),type:"text"})).slice(0,12);
+}
+function creditBalance(){ return credits.reduce((s,c)=>s+(c.credits||0),0); }
+function recordsOf(appId){ return appRecords.filter(r=>r.app_id===appId); }
+function renderMessage(m){
+  const a=m.author_agent_id?byId(agents,m.author_agent_id):null;
+  const who=esc(a?.display_name||(m.author_profile_id===currentUser?.id?'You':'Member'));
+  const meta=`<div class="meta">${who} · ${new Date(m.created_at).toLocaleString()} · ${esc(m.kind)}</div>`;
+  if (m.kind==='app_card') {
+    const mm=String(m.body||"").match(/app:([0-9a-f-]{36})/i);
+    const app=mm?byId(apps,mm[1]):null;
+    if (app) {
+      const recs=recordsOf(app.id);
+      const rows=recs.slice(0,6).map(r=>`<div class="kv"><b>${esc(r.title)}</b> · ${esc(r.status)}${Object.entries(r.values||{}).slice(0,3).map(([k,v])=>` · ${esc(k)}: ${esc(String(v))}`).join("")}</div>`).join("")||'<div class="kv">No records yet.</div>';
+      return `<div class="msg ${a?'agent':''}">${meta}<div class="appcard"><div class="item-head"><b>${esc(app.name)}</b><span class="pill ${app.status==='published'?'green':'gold'}">${esc(app.status)}</span></div><div class="muted">App · ${esc(app.kind)} · ${recs.length} records · one App, every linked context stays current</div>${rows}<div class="row" style="margin-top:8px"><button class="small secondary" data-open-app="${app.id}" type="button">Open App</button></div></div></div>`;
+    }
+  }
+  return `<div class="msg ${a?'agent':''}">${meta}<div>${esc(m.body)}</div></div>`;
+}
+async function q(table, build){
+  const r = await build(supabase.from(table).select("*"));
+  if (r.error) throw r.error;
+  return r.data||[];
+}
+async function loadVerify(){
+  if (!selectedJacketId) { stips=[]; checks=[]; renderVerify(); return; }
+  try {
+    [stips, checks] = await Promise.all([
+      q("stips", x=>x.eq("jacket_id",selectedJacketId).order("created_at",{ascending:true})),
+      q("verify_checks", x=>x.eq("jacket_id",selectedJacketId).order("created_at",{ascending:true}))
+    ]);
+  } catch(e){ say(`Verify load failed: ${e.message}`,'err'); }
+  renderVerify();
+}
+async function loadPlatform(){
+  if (!currentUser || !selectedConsoleId) return;
+  const jobs = [
+    q("apps", x=>x.eq("console_id",selectedConsoleId).order("created_at",{ascending:true})).then(d=>{apps=d;}),
+    q("approvals", x=>x.eq("console_id",selectedConsoleId).order("created_at",{ascending:false})).then(d=>{approvals=d;}),
+    q("credit_ledger", x=>x.eq("console_id",selectedConsoleId).order("created_at",{ascending:false})).then(d=>{credits=d;}),
+    q("connections", x=>x.eq("console_id",selectedConsoleId).order("created_at",{ascending:true})).then(d=>{connections=d;}),
+    q("automations", x=>x.eq("console_id",selectedConsoleId).order("created_at",{ascending:false})).then(d=>{automations=d;}),
+    q("memories", x=>x.eq("console_id",selectedConsoleId).order("created_at",{ascending:false})).then(d=>{memories=d;}),
+    q("files", x=>x.eq("console_id",selectedConsoleId).order("created_at",{ascending:false})).then(d=>{filesListData=d;})
+  ];
+  const res = await Promise.allSettled(jobs);
+  const bad = res.find(r=>r.status==='rejected');
+  if (bad) say(`Part of the platform failed to load: ${bad.reason?.message||bad.reason}`,'err');
+  try {
+    if (apps.length) {
+      const ids=apps.map(a=>a.id);
+      [appRecords, appLinks, appViews] = await Promise.all([
+        q("app_records", x=>x.in("app_id",ids).order("created_at",{ascending:true})),
+        q("app_links", x=>x.in("app_id",ids)),
+        q("app_views", x=>x.in("app_id",ids))
+      ]);
+    } else { appRecords=[]; appLinks=[]; appViews=[]; }
+    if (connections.length) connGrants = await q("connection_grants", x=>x.in("connection_id",connections.map(c=>c.id))); else connGrants=[];
+  } catch(e){ say(`App details failed to load: ${e.message}`,'err'); }
+  if (!byId(apps,selectedAppId)) selectedAppId = apps[0]?.id || "";
+  localStorage.setItem("consoleai_app_id", selectedAppId);
+  await loadVerify();
+  renderApps(); renderAppDetail(); renderApprovals(); renderCredits(); renderConnections(); renderAutomations(); renderMemories(); renderFiles();
+  if (selectedThreadId) { /* re-render app cards with fresh record counts */ try{ await loadMessages(); }catch{} }
+}
+const APP_TEMPLATES = {
+  tracker:{name:"Invoice Tracker",kind:"tracker",fields:"Client, Amount, Due date",desc:"Money owed to us, kept current from the room’s work."},
+  board:{name:"Hiring Pipeline",kind:"board",fields:"Candidate, Role, Source",desc:"One card per person, moving through the stages."},
+  dashboard:{name:"Pipeline Dashboard",kind:"dashboard",fields:"Deal, Stage, Value",desc:"What the App counts, from its own records."},
+  form_page:{name:"Floor Count Page",kind:"form_page",fields:"Item, Count, Location",desc:"A simple page of fields anyone in the room can submit from a phone."}
+};
+function renderApps(){
+  const el=$("#appList"); if(!el) return;
+  el.innerHTML = apps.length ? apps.map(a=>{
+    const n=recordsOf(a.id).length;
+    const links=appLinks.filter(l=>l.app_id===a.id).length;
+    return `<div class="selectable ${a.id===selectedAppId?'active':''}" data-app="${a.id}"><div class="item-head"><b>${esc(a.name)}</b><span class="pill ${a.status==='published'?'green':'gold'}">${esc(a.status)}</span></div><div class="muted">${esc(a.kind)} · ${n} records · ${links} links · ${esc(a.visibility)}${a.home_room_id?' · home room':''}</div><div>${esc(excerpt(a.description,140))}</div></div>`;
+  }).join("") : '<div class="empty">No Apps yet. Create one above, start from a template, or let an agent return one in a dispatch.</div>';
+  el.querySelectorAll("[data-app]").forEach(x=>x.addEventListener("click",()=>{ selectedAppId=x.dataset.app; localStorage.setItem("consoleai_app_id",selectedAppId); const ap=byId(apps,selectedAppId); appViewKind = ap?.kind==="board" ? "board" : ap?.kind==="dashboard" ? "dashboard" : "table"; localStorage.setItem("consoleai_app_view",appViewKind); renderApps(); renderAppDetail(); }));
+}
+function recordRow(r, fields){
+  const statusOpts=[...new Set(["open","doing","review","done","paid","overdue",r.status])].map(s=>`<option ${s===r.status?'selected':''}>${esc(s)}</option>`).join("");
+  const vals=fields.map(f=>`<div class="kv">${esc(f.label)}: <b>${esc(String(r.values?.[f.key] ?? ""))}</b></div>`).join("");
+  const extra=Object.entries(r.values||{}).filter(([k])=>!fields.some(f=>f.key===k)).map(([k,v])=>`<div class="kv">${esc(k)}: <b>${esc(String(v))}</b></div>`).join("");
+  return `<div class="rec"><div class="item-head"><b>${esc(r.title)}</b><select data-record-status="${r.id}">${statusOpts}</select></div>${vals}${extra}<div class="muted">${new Date(r.created_at).toLocaleString()}${r.created_by_agent?" · by agent":""}</div><div class="row" style="margin-top:6px"><button class="small secondary" data-del-record="${r.id}" type="button">Delete record</button></div></div>`;
+}
+function renderAppDetail(){
+  const el=$("#appDetail"); if(!el) return;
+  const app=byId(apps,selectedAppId);
+  if (!app) { el.innerHTML='<div class="empty">Select an App to see and edit its records.</div>'; return; }
+  const fields=parseFields(app.fields);
+  const recs=recordsOf(app.id);
+  const links=appLinks.filter(l=>l.app_id===app.id);
+  let body="";
+  if (appViewKind==="board") {
+    const stages=[...new Set([...(app.kind==="board"?["open","doing","review","done"]:[]), ...recs.map(r=>r.status)])];
+    body=`<div class="boardcols">${stages.map(st=>`<div class="boardcol"><h5>${esc(st)} (${recs.filter(r=>r.status===st).length})</h5>${recs.filter(r=>r.status===st).map(r=>recordRow(r,fields)).join("")||'<div class="kv">Empty</div>'}</div>`).join("")}</div>`;
+  } else if (appViewKind==="dashboard") {
+    const byStatus={}; recs.forEach(r=>byStatus[r.status]=(byStatus[r.status]||0)+1);
+    body=`<div class="proof" style="margin-top:6px">${Object.entries(byStatus).map(([k,v])=>`<div><b>${esc(k)}</b>${v} records</div>`).join("")||'<div><b>0</b>No records yet</div>'}</div>` + recs.map(r=>recordRow(r,fields)).join("");
+  } else {
+    body=recs.length?`<table class="rec-table"><thead><tr><th>Record</th>${fields.map(f=>`<th>${esc(f.label)}</th>`).join("")}<th>Status</th></tr></thead><tbody>${recs.map(r=>`<tr><td><b>${esc(r.title)}</b><br><button class="small secondary" data-del-record="${r.id}" type="button">Delete</button></td>${fields.map(f=>`<td>${esc(String(r.values?.[f.key] ?? ""))}</td>`).join("")}<td><select data-record-status="${r.id}">${[...new Set(["open","doing","review","done","paid","overdue",r.status])].map(s2=>`<option ${s2===r.status?'selected':''}>${esc(s2)}</option>`).join("")}</select></td></tr>`).join("")}</tbody></table>`:'<div class="empty">No records yet — add the first one below.</div>';
+  }
+  const fieldInputs=fields.map(f=>`<label>${esc(f.label)}</label><input data-record-field="${esc(f.key)}" placeholder="${esc(f.label)}">`).join("");
+  el.innerHTML=`<div class="item"><div class="item-head"><h4>${esc(app.name)}</h4><span class="pill ${app.status==='published'?'green':'gold'}">${esc(app.status)}</span></div>
+  <div class="muted">/${esc(app.slug)} · ${esc(app.kind)} · ${recs.length} records · linked contexts: ${links.length}${app.published_at?` · published ${new Date(app.published_at).toLocaleString()}`:''}</div>
+  <p>${esc(app.description||"")}</p>
+  <div class="row"><button class="small secondary" data-view-kind="table" type="button">Table</button><button class="small secondary" data-view-kind="board" type="button">Board</button><button class="small secondary" data-view-kind="dashboard" type="button">Dashboard</button></div>
+  ${body}
+  <h3>${app.kind==="form_page"?"Submit an entry":"Add a record"}</h3>
+  <label>Title</label><input id="recordTitle" placeholder="Record title">
+  ${fieldInputs}
+  <label>Status</label><input id="recordStatus" value="open">
+  <div class="row" style="margin-top:10px"><button id="addRecordBtn" type="button">${app.kind==="form_page"?"Submit":"Add record"}</button></div>
+  <div class="row" style="margin-top:12px"><button class="small secondary" id="postAppCardBtn" type="button">Post App card to thread</button><button class="small secondary" id="linkAppRoomBtn" type="button">Link to selected room</button><button class="small secondary" id="appThreadBtn" type="button">Open App thread</button><button class="small" id="publishAppBtn" type="button">${app.status==='published'?'Published':'Request publish approval'}</button></div>
+  <p class="muted">Publishing routes through the Approvals inbox. A published App is live inside this console for everyone who can access it; public anonymous App pages are not wired yet.</p></div>`;
+  el.querySelectorAll("[data-record-status]").forEach(sel=>sel.addEventListener("change",async()=>{ const {error}=await supabase.from("app_records").update({status:sel.value}).eq("id",sel.dataset.recordStatus); if(error)say(error.message,'err'); else await loadPlatform(); }));
+  el.querySelectorAll("[data-del-record]").forEach(b=>b.addEventListener("click",async()=>{ const {error}=await supabase.from("app_records").delete().eq("id",b.dataset.delRecord); if(error)say(error.message,'err'); else await loadPlatform(); }));
+  el.querySelectorAll("[data-view-kind]").forEach(b=>b.addEventListener("click",async()=>{ appViewKind=b.dataset.viewKind; localStorage.setItem("consoleai_app_view",appViewKind); await ensureAppView(app, appViewKind==="dashboard"?"table":appViewKind); renderAppDetail(); }));
+  $("#addRecordBtn")?.addEventListener("click",async()=>{
+    try{
+      const title=$("#recordTitle").value.trim(); if(!title) throw new Error("Record needs a title.");
+      const values={}; el.querySelectorAll("[data-record-field]").forEach(i=>{ if(i.value.trim()) values[i.dataset.recordField]=i.value.trim(); });
+      const {error}=await supabase.from("app_records").insert({app_id:app.id,created_by:currentUser.id,title,status:($("#recordStatus").value.trim()||"open").slice(0,40),values});
+      if(error) throw error;
+      say(`Record added to ${app.name}. Every linked context now shows it.`,'ok'); await loadPlatform();
+    }catch(e){ say(e.message,'err'); }
+  });
+  $("#postAppCardBtn")?.addEventListener("click",()=>postAppCard(app).catch(e=>say(e.message,'err')));
+  $("#linkAppRoomBtn")?.addEventListener("click",async()=>{
+    try{ if(!selectedRoomId) throw new Error("Select a room first.");
+      const {error}=await supabase.from("app_links").insert({app_id:app.id,room_id:selectedRoomId,created_by:currentUser.id});
+      if(error && !/duplicate|unique/i.test(error.message)) throw error;
+      say(`${app.name} linked into the selected room. The same records now render there.`,'ok'); await loadPlatform();
+    }catch(e){ say(e.message,'err'); }
+  });
+  $("#appThreadBtn")?.addEventListener("click",()=>openAppThread(app).catch(e=>say(e.message,'err')));
+  $("#publishAppBtn")?.addEventListener("click",async()=>{
+    if (app.status==='published') { say(`${app.name} is already published inside this console.`,'ok'); return; }
+    try{
+      const {error}=await supabase.from("approvals").insert({console_id:selectedConsoleId,app_id:app.id,requested_by:currentUser.id,kind:'publish',title:`Publish App: ${app.name}`,payload:{slug:app.slug}});
+      if(error) throw error;
+      say(`Publish approval requested for ${app.name}. Decide it in the Approvals tab; approving flips the App to published.`,'ok'); showInspector("approvals"); await loadPlatform();
+    }catch(e){ say(e.message,'err'); }
+  });
+}
+async function ensureAppView(app, kind){
+  const name = kind==="board" ? "Board" : "Table";
+  if (appViews.some(v=>v.app_id===app.id && v.name===name)) return;
+  const {data,error}=await supabase.from("app_views").insert({app_id:app.id,created_by:currentUser.id,name,view_kind:kind}).select().single();
+  if (!error && data) appViews.push(data);
+}
+async function postAppCard(app){
+  if (!selectedThreadId) throw new Error("Select or create a thread first.");
+  const recs=recordsOf(app.id);
+  const body=`app:${app.id}\n${app.name} — ${recs.length} records · ${app.status}`;
+  const {error}=await supabase.from("messages").insert({thread_id:selectedThreadId,author_profile_id:currentUser.id,kind:'app_card',body});
+  if(error) throw error;
+  await loadMessages(); say(`App card posted. It renders live records wherever this thread is read.`,'ok');
+}
+async function openAppThread(app){
+  const roomId = app.home_room_id || selectedRoomId;
+  if (!roomId) throw new Error("Select a room first (this App has no home room).");
+  if (roomId!==selectedRoomId) { selectedRoomId=roomId; localStorage.setItem("consoleai_room_id",selectedRoomId); renderRooms(); await loadRoomContext(); }
+  let t=threads.find(x=>x.anchor_type==='app' && x.anchor_id===app.id);
+  if (!t) {
+    const {data,error}=await supabase.from("threads").insert({room_id:roomId,created_by:currentUser.id,title:`App: ${app.name}`,anchor_type:'app',anchor_id:app.id}).select().single();
+    if(error) throw error; t=data; threads.push(t);
+    const l=await supabase.from("app_links").insert({app_id:app.id,thread_id:t.id,created_by:currentUser.id});
+    if (l.error && !/duplicate|unique/i.test(l.error.message)) throw l.error;
+  }
+  selectedThreadId=t.id; localStorage.setItem("consoleai_thread_id",selectedThreadId); renderThreads(); await loadMessages(); say(`Anchored App thread open: ${t.title}`,'ok');
+}
+async function createAppFromPayload(rawApp, agent, jacket, dispatch){
+  if (!rawApp || typeof rawApp!=="object" || !String(rawApp.name||"").trim()) return null;
+  const fields=parseFields(rawApp.fields||[]);
+  const payload={
+    console_id:selectedConsoleId, home_room_id:jacket?.room_id||selectedRoomId||null,
+    created_by:currentUser.id, created_by_agent:agent?.id||null, source_dispatch_id:dispatch?.id||null,
+    name:String(rawApp.name).slice(0,120), slug:slugify(rawApp.slug||rawApp.name),
+    kind:["tracker","board","dashboard","form_page","custom"].includes(rawApp.kind)?rawApp.kind:"custom",
+    description:String(rawApp.description||"").slice(0,2000), fields, visibility:"room", status:"draft"
+  };
+  if (!payload.slug || payload.slug.length<2) return null;
+  let app = apps.find(x=>x.slug===payload.slug);
+  if (!app) {
+    const {data,error}=await supabase.from("apps").insert(payload).select().single();
+    if(error) throw error; app=data; apps.push(app);
+    await ensureAppView(app, app.kind==="board"?"board":"table");
+    if (payload.home_room_id) await supabase.from("app_links").insert({app_id:app.id,room_id:payload.home_room_id,created_by:currentUser.id});
+  }
+  const recs=Array.isArray(rawApp.records)?rawApp.records.slice(0,50):[];
+  for (const r of recs) {
+    if (!r || !String(r.title||"").trim()) continue;
+    const {data,error}=await supabase.from("app_records").insert({app_id:app.id,created_by:currentUser.id,created_by_agent:agent?.id||null,source_dispatch_id:dispatch?.id||null,title:String(r.title).slice(0,200),status:String(r.status||"open").slice(0,40),values:(r.values&&typeof r.values==="object")?r.values:{}}).select().single();
+    if (!error && data) appRecords.push(data);
+  }
+  selectedAppId=app.id; localStorage.setItem("consoleai_app_id",selectedAppId);
+  return app;
+}
+async function chargeDispatch(dispatch){
+  const est=Number(dispatch?.estimated_credits||0);
+  if (!est || est<=0 || !credits.length) return;
+  const {data,error}=await supabase.from("credit_ledger").insert({console_id:selectedConsoleId,created_by:currentUser.id,jacket_id:dispatch.jacket_id,dispatch_id:dispatch.id,entry_kind:'dispatch_charge',credits:-est,note:'Completed dispatch charge (test ledger)',idempotency_key:`dispatch:${dispatch.id}`}).select().single();
+  if (!error && data) credits.unshift(data);
+}
+function renderVerify(){
+  const sum=$("#verifySummary"); if(!sum) return;
+  const j=byId(jackets,selectedJacketId);
+  if (!j) { sum.className="empty"; sum.textContent="Select a jacket."; $("#stipsList").innerHTML=""; $("#checksList").innerHTML=""; return; }
+  const reqChecks=checks.filter(c=>c.required), passChecks=reqChecks.filter(c=>c.status==='pass');
+  const reqStips=stips.filter(x=>x.required), okStips=reqStips.filter(x=>x.satisfied);
+  const ready=reqChecks.length>0 && passChecks.length===reqChecks.length && okStips.length===reqStips.length;
+  sum.className="item";
+  sum.innerHTML=`<b>${esc(j.title)}</b> · state <span class="pill gold">${esc(j.state)}</span><br>
+  Required checks: ${passChecks.length}/${reqChecks.length} pass · Required stips: ${okStips.length}/${reqStips.length} satisfied<br>
+  ${j.state==='funded'?'This jacket is funded. The database opened it only because the rule above held.': ready?'Ready: “Try move to funded” should be accepted by the database.':'Not fundable yet — the database will refuse, and its exact reason will be shown.'}`;
+  $("#stipsList").innerHTML = stips.length ? stips.map(x=>`<div class="item"><div class="item-head"><b>${esc(x.label)}</b><span class="pill ${x.satisfied?'green':'gold'}">${x.satisfied?'satisfied':'owed'}${x.required?' · required':''}</span></div><div class="muted">${esc(x.detail||"")}${x.satisfied_at?` · ${new Date(x.satisfied_at).toLocaleString()}`:""}</div><div class="row"><button class="small secondary" data-toggle-stip="${x.id}" type="button">${x.satisfied?'Mark not satisfied':'Mark satisfied'}</button><button class="small secondary" data-del-stip="${x.id}" type="button">Delete</button></div></div>`).join("") : '<div class="empty">No stips on this jacket yet.</div>';
+  $("#checksList").innerHTML = checks.length ? checks.map(c=>`<div class="item"><div class="item-head"><b>${esc(c.label)}</b><span class="pill ${c.status==='pass'?'green':c.status==='fail'?'red':'gold'}">${esc(c.status)}${c.required?' · required':''}</span></div><div class="muted">${esc(c.kind)}${c.checked_at?` · checked ${new Date(c.checked_at).toLocaleString()}`:""}</div><div class="row"><select data-check-status="${c.id}">${["pending","pass","fail","waived"].map(s2=>`<option ${s2===c.status?'selected':''}>${s2}</option>`).join("")}</select><button class="small secondary" data-del-check="${c.id}" type="button">Delete</button></div></div>`).join("") : '<div class="empty">No verification checks yet. Funded requires at least one required check.</div>';
+  document.querySelectorAll("[data-toggle-stip]").forEach(b=>b.addEventListener("click",async()=>{ const x=byId(stips,b.dataset.toggleStip); const {error}=await supabase.from("stips").update({satisfied:!x.satisfied,satisfied_by:!x.satisfied?currentUser.id:null}).eq("id",x.id); if(error)say(error.message,'err'); else await loadVerify(); }));
+  document.querySelectorAll("[data-del-stip]").forEach(b=>b.addEventListener("click",async()=>{ const {error}=await supabase.from("stips").delete().eq("id",b.dataset.delStip); if(error)say(error.message,'err'); else await loadVerify(); }));
+  document.querySelectorAll("[data-check-status]").forEach(sel=>sel.addEventListener("change",async()=>{ const {error}=await supabase.from("verify_checks").update({status:sel.value,checked_by:sel.value==='pending'?null:currentUser.id}).eq("id",sel.dataset.checkStatus); if(error)say(error.message,'err'); else await loadVerify(); }));
+  document.querySelectorAll("[data-del-check]").forEach(b=>b.addEventListener("click",async()=>{ const {error}=await supabase.from("verify_checks").delete().eq("id",b.dataset.delCheck); if(error)say(error.message,'err'); else await loadVerify(); }));
+}
+function renderApprovals(){
+  const el=$("#approvalsList"); if(!el) return;
+  el.innerHTML = approvals.length ? approvals.map(x=>`<div class="item"><div class="item-head"><b>${esc(x.title)}</b><span class="pill ${x.status==='approved'?'green':x.status==='rejected'?'red':'gold'}">${esc(x.status)}</span></div><div class="muted">${esc(x.kind)} · ${new Date(x.created_at).toLocaleString()}${x.decided_at?` · decided ${new Date(x.decided_at).toLocaleString()}`:""}</div>${x.status==='pending'?`<div class="row" style="margin-top:8px"><button class="small" data-approve="${x.id}" type="button">Approve</button><button class="small secondary" data-reject="${x.id}" type="button">Reject</button></div>`:''}</div>`).join("") : '<div class="empty">No approvals yet.</div>';
+  el.querySelectorAll("[data-approve]").forEach(b=>b.addEventListener("click",()=>decideApproval(b.dataset.approve,true).catch(e=>say(e.message,'err'))));
+  el.querySelectorAll("[data-reject]").forEach(b=>b.addEventListener("click",()=>decideApproval(b.dataset.reject,false).catch(e=>say(e.message,'err'))));
+}
+async function decideApproval(id, ok){
+  const ap=byId(approvals,id); if(!ap) return;
+  if (ap.expires_at && new Date(ap.expires_at) < new Date()) {
+    await supabase.from("approvals").update({status:'expired',decided_by:currentUser.id,decided_at:new Date().toISOString()}).eq("id",id);
+    say('That approval expired before a decision. Request it again against current inputs.','err'); await loadPlatform(); return;
+  }
+  const {error}=await supabase.from("approvals").update({status:ok?'approved':'rejected',decided_by:currentUser.id,decided_at:new Date().toISOString()}).eq("id",id);
+  if(error) throw error;
+  if (ok && ap.kind==='publish' && ap.app_id) {
+    const r=await supabase.from("apps").update({status:'published'}).eq("id",ap.app_id);
+    if(r.error) throw r.error;
+    say('Approval recorded — App is now published inside this console.','ok');
+  } else if (ok && ap.kind==='fund' && ap.jacket_id) {
+    const r=await supabase.from("job_jackets").update({state:'funded'}).eq("id",ap.jacket_id);
+    if(r.error) say(`Approved, but the database still refuses funded: ${r.error.message}`,'err'); else say('Approval recorded — jacket funded (every required check/stip held).','ok');
+    await loadJackets(); renderJackets();
+  } else {
+    say(ok?`Approved: ${ap.title}. The approved action is now yours to perform; nothing was sent automatically.`:`Rejected: ${ap.title}.`,'ok');
+  }
+  await loadPlatform();
+}
+function renderCredits(){
+  const balEl=$("#creditBalance"); if(!balEl) return;
+  const bal=creditBalance();
+  balEl.className= credits.length? "item":"empty";
+  balEl.innerHTML= credits.length? `<b>${bal} credits</b> pooled balance (test ledger) · ${credits.length} entries${bal<=0?' · <span class="err">exhausted — dispatch pauses</span>':''}` : 'No credit ledger yet. Add a test grant to adopt credits for this console.';
+  $("#creditsList").innerHTML=credits.slice(0,10).map(c=>`<div class="item"><div class="item-head"><b>${c.credits>0?'+':''}${c.credits} credits</b><span class="pill">${esc(c.entry_kind)}</span></div><div class="muted">${new Date(c.created_at).toLocaleString()} · ${esc(c.note||"")}</div></div>`).join("");
+}
+function renderConnections(){
+  const el=$("#connectionsList"); if(!el) return;
+  el.innerHTML = connections.length ? connections.map(c=>{
+    const grants=connGrants.filter(g=>g.connection_id===c.id);
+    const gtxt=grants.map(g=>{ const a=g.agent_id?byId(agents,g.agent_id):null; const r=g.room_id?byId(rooms,g.room_id):null; return `${esc(a?.display_name||('#'+(r?.name||'room')))} (${esc(g.access)})`; }).join(", ")||"no grants yet";
+    return `<div class="item"><div class="item-head"><b>${esc(c.name)}</b><span class="pill ${c.status==='connected'?'green':'gold'}">${esc(c.status)}</span></div><div class="muted">${esc(c.kind)} · ref ${esc(c.auth_ref||'—')} · grants: ${gtxt}</div><div class="row"><button class="small secondary" data-grant-conn="${c.id}" type="button">Grant to selected agent</button><button class="small secondary" data-del-conn="${c.id}" type="button">Delete</button></div></div>`;
+  }).join("") : '<div class="empty">No connections registered yet.</div>';
+  el.querySelectorAll("[data-grant-conn]").forEach(b=>b.addEventListener("click",async()=>{ try{ const agentId=$("#grantAgent").value; if(!agentId) throw new Error("Register/select an agent first."); const {error}=await supabase.from("connection_grants").insert({connection_id:b.dataset.grantConn,agent_id:agentId,created_by:currentUser.id,access:'write'}); if(error && !/duplicate|unique/i.test(error.message)) throw error; say('Connection granted to that agent. Dispatch packets include granted connection names only — never secrets.','ok'); await loadPlatform(); }catch(e){ say(e.message,'err'); } }));
+  el.querySelectorAll("[data-del-conn]").forEach(b=>b.addEventListener("click",async()=>{ const {error}=await supabase.from("connections").delete().eq("id",b.dataset.delConn); if(error)say(error.message,'err'); else await loadPlatform(); }));
+}
+function renderAutomations(){
+  const el=$("#autosList"); if(!el) return;
+  el.innerHTML = automations.length ? automations.map(x=>{ const a=x.agent_id?byId(agents,x.agent_id):null; return `<div class="item"><div class="item-head"><b>${esc(x.name)}</b><span class="pill ${x.status==='active'?'green':'gold'}">${esc(x.status)}</span></div><div class="muted">${esc(x.trigger_kind)}${x.schedule_cron?` · ${esc(x.schedule_cron)}`:""} · agent ${esc(a?.display_name||"—")} · fails ${x.fail_count}${x.last_run_at?` · last run ${new Date(x.last_run_at).toLocaleString()}`:""}</div><p>${esc(excerpt(x.instructions,180))}</p><div class="row"><button class="small" data-run-auto="${x.id}" type="button">Run now</button><button class="small secondary" data-toggle-auto="${x.id}" type="button">${x.status==='active'?'Pause':'Activate'}</button><button class="small secondary" data-del-auto="${x.id}" type="button">Delete</button></div></div>`; }).join("") : '<div class="empty">No automations yet.</div>';
+  el.querySelectorAll("[data-run-auto]").forEach(b=>b.addEventListener("click",()=>runAutomation(b.dataset.runAuto).catch(e=>say(e.message,'err'))));
+  el.querySelectorAll("[data-toggle-auto]").forEach(b=>b.addEventListener("click",async()=>{ const x=byId(automations,b.dataset.toggleAuto); const {error}=await supabase.from("automations").update({status:x.status==='active'?'paused':'active',fail_count:x.status==='active'?x.fail_count:0}).eq("id",x.id); if(error)say(error.message,'err'); else await loadPlatform(); }));
+  el.querySelectorAll("[data-del-auto]").forEach(b=>b.addEventListener("click",async()=>{ const {error}=await supabase.from("automations").delete().eq("id",b.dataset.delAuto); if(error)say(error.message,'err'); else await loadPlatform(); }));
+}
+async function runAutomation(id){
+  const x=byId(automations,id); if(!x) return;
+  if (x.jacket_id && byId(jackets,x.jacket_id)) { selectedJacketId=x.jacket_id; localStorage.setItem("consoleai_jacket_id",selectedJacketId); renderJackets(); await loadDispatches(); await loadVerify(); }
+  const agentId=x.agent_id || $("#dispatchAgent")?.value;
+  showInspector("runs");
+  const created=await createDispatch({agentId, instructions:x.instructions||x.name});
+  const ran=byId(dispatches,created.id);
+  const failed=ran && ran.status!=='completed';
+  await supabase.from("automations").update({last_run_at:new Date().toISOString(), fail_count: failed ? (x.fail_count||0)+1 : 0}).eq("id",x.id);
+  say(failed?`Automation ran and the dispatch ended ${ran.status}. Fail count updated; 3 fails auto-pauses it in the database.`:`Automation ran: dispatch completed.`, failed?'err':'ok');
+  await loadPlatform();
+}
+function renderMemories(){
+  const el=$("#memoriesList"); if(!el) return;
+  const visible=memories.filter(m=>!m.expires_at || new Date(m.expires_at)>new Date());
+  el.innerHTML = visible.length ? visible.map(m=>`<div class="item"><div class="item-head"><b>${esc(m.title)}</b><span class="pill">${esc(m.kind)} · ${esc(m.scope)}</span></div><p>${esc(m.body)}</p><div class="muted">${new Date(m.created_at).toLocaleString()}${m.review_on?` · review ${esc(m.review_on)}`:""}</div><div class="row"><button class="small secondary" data-del-mem="${m.id}" type="button">Delete</button></div></div>`).join("") : '<div class="empty">No memories yet. Save what the next human or agent must know.</div>';
+  el.querySelectorAll("[data-del-mem]").forEach(b=>b.addEventListener("click",async()=>{ const {error}=await supabase.from("memories").delete().eq("id",b.dataset.delMem); if(error)say(error.message,'err'); else await loadPlatform(); }));
+}
+function renderFiles(){
+  const el=$("#filesList"); if(!el) return;
+  el.innerHTML = filesListData.length ? filesListData.map(f=>`<div class="item"><div class="item-head"><b>${esc(f.name)}</b><span class="pill">${esc(f.kind)}</span></div><div class="muted">${new Date(f.created_at).toLocaleString()}</div>${f.external_url?`<p><a href="${esc(f.external_url)}" target="_blank" rel="noopener">Open linked file</a></p>`:''}<div class="row"><button class="small secondary" data-del-file="${f.id}" type="button">Delete</button></div></div>`).join("") : '<div class="empty">No files linked yet.</div>';
+  el.querySelectorAll("[data-del-file]").forEach(b=>b.addEventListener("click",async()=>{ const {error}=await supabase.from("files").delete().eq("id",b.dataset.delFile); if(error)say(error.message,'err'); else await loadPlatform(); }));
 }
 
 async function loadConsoles() {
@@ -291,6 +700,7 @@ async function refreshWorkspace() {
   renderAgentOptions(); renderRooms(); renderJackets();
   await loadRoomContext();
   await loadDispatches();
+  await loadPlatform();
 }
 async function refreshAll() { await loadConsoles(); }
 
@@ -308,6 +718,8 @@ function renderAgentOptions() {
   const opts = agents.map(a=>`<option value="${a.id}">${esc(a.display_name)} · ${esc(a.slug)}</option>`).join("");
   $("#roomDefaultAgent").innerHTML = '<option value="">No default</option>'+opts;
   $("#dispatchAgent").innerHTML = opts || '<option value="">Register an agent first</option>';
+  const aa=$("#autoAgent"); if (aa) aa.innerHTML = opts || '<option value="">Register an agent first</option>';
+  const ga2=$("#grantAgent"); if (ga2) ga2.innerHTML = opts || '<option value="">Register an agent first</option>';
   document.querySelectorAll("[data-handoff-agent]").forEach(sel=>{ const cur=sel.value; sel.innerHTML=opts; if(cur) sel.value=cur; });
 }
 
@@ -376,7 +788,8 @@ async function loadMessages() {
   if (!selectedThreadId) { $("#messageList").innerHTML='<p class="muted">No thread yet. Create “General” with New thread.</p>'; return; }
   const { data, error } = await supabase.from("messages").select("*").eq("thread_id",selectedThreadId).order("created_at",{ascending:true}).limit(200);
   if (error) throw error;
-  $("#messageList").innerHTML = data.length ? data.map(m=>{const a=m.author_agent_id?byId(agents,m.author_agent_id):null;return `<div class="msg ${a?'agent':''}"><div class="meta">${esc(a?.display_name||(m.author_profile_id===currentUser.id?'You':'Member'))} · ${new Date(m.created_at).toLocaleString()} · ${esc(m.kind)}</div><div>${esc(m.body)}</div></div>`}).join("") : '<p class="muted">No messages yet.</p>';
+  $("#messageList").innerHTML = data.length ? data.map(renderMessage).join("") : '<p class="muted">No messages yet.</p>';
+  document.querySelectorAll("[data-open-app]").forEach(b=>b.addEventListener("click",()=>{ selectedAppId=b.dataset.openApp; localStorage.setItem("consoleai_app_id",selectedAppId); showInspector("apps"); renderApps(); renderAppDetail(); }));
   $("#messageList").scrollTop=$("#messageList").scrollHeight;
 }
 
@@ -389,7 +802,7 @@ async function loadJackets() {
 function renderJackets() {
   $("#jacketList").innerHTML = jackets.length ? jackets.map(j=>`<div class="selectable ${j.id===selectedJacketId?'active':''}" data-jacket="${j.id}"><div class="item-head"><b>${esc(j.title)}</b><span class="pill gold">${esc(j.state)}</span></div><div class="muted">Budget cap ${j.budget_cap_credits} credits · ${esc(j.visibility)}${j.room_id?' · room anchored':''}</div><div>${esc(excerpt(j.brief,180))}</div><div class="row" style="margin-top:8px"><label style="margin:0">State</label><select data-jacket-state="${j.id}">${['intake','desked','offered','approved','dispatched','evidence_open','verifying','safely_halted','on_hold','handled_error','errored','cancelled'].map(s=>`<option ${s===j.state?'selected':''}>${s}</option>`).join('')}</select></div></div>`).join("") : '<div class="empty">No job jackets yet.</div>';
   renderInspector(); applyShellSearch();
-  document.querySelectorAll("[data-jacket]").forEach(el=>el.addEventListener("click",async(e)=>{ if(e.target.tagName==='SELECT')return; selectedJacketId=el.dataset.jacket; localStorage.setItem("consoleai_jacket_id",selectedJacketId); renderJackets(); await loadDispatches(); }));
+  document.querySelectorAll("[data-jacket]").forEach(el=>el.addEventListener("click",async(e)=>{ if(e.target.tagName==='SELECT')return; selectedJacketId=el.dataset.jacket; localStorage.setItem("consoleai_jacket_id",selectedJacketId); renderJackets(); await loadDispatches(); await loadVerify(); }));
   document.querySelectorAll("[data-jacket-state]").forEach(sel=>sel.addEventListener("change",async()=>{ const {error}=await supabase.from("job_jackets").update({state:sel.value}).eq("id",sel.dataset.jacketState); if(error){say(error.message,'err');} else {await loadJackets();renderJackets();} }));
 }
 
@@ -429,7 +842,16 @@ async function addStep(dispatchId, sequence, kind, status, summary, output={}) {
 }
 async function executeDispatch(dispatch) {
   const jacket=byId(jackets,dispatch.jacket_id); const agent=byId(agents,dispatch.agent_id);
-  const payload={event:'consoleai.dispatch.v1',dispatch_id:dispatch.id,parent_dispatch_id:dispatch.parent_dispatch_id,handoff_note:dispatch.handoff_note,mode:dispatch.mode,instructions:dispatch.instructions,jacket:jacket?{id:jacket.id,title:jacket.title,brief:jacket.brief,acceptance_criteria:jacket.acceptance_criteria,budget_cap_credits:jacket.budget_cap_credits}:null,agent:agent?{id:agent.id,slug:agent.slug,kind:agent.kind,brain_model:agent.brain_model,capabilities:agent.capabilities}:null};
+  const room = jacket?.room_id ? byId(rooms,jacket.room_id) : byId(rooms,selectedRoomId);
+  const grantedConnections = connGrants.filter(g=>g.agent_id===agent?.id).map(g=>{ const c=byId(connections,g.connection_id); return c?{name:c.name,kind:c.kind,status:c.status,access:g.access,scopes:c.scopes}:null; }).filter(Boolean);
+  const payload={event:'consoleai.dispatch.v1',dispatch_id:dispatch.id,parent_dispatch_id:dispatch.parent_dispatch_id,handoff_note:dispatch.handoff_note,mode:dispatch.mode,instructions:dispatch.instructions,
+    jacket:jacket?{id:jacket.id,title:jacket.title,brief:jacket.brief,acceptance_criteria:jacket.acceptance_criteria,budget_cap_credits:jacket.budget_cap_credits}:null,
+    agent:agent?{id:agent.id,slug:agent.slug,kind:agent.kind,brain_model:agent.brain_model,capabilities:agent.capabilities,instructions:agent.instructions}:null,
+    room:room?{id:room.id,name:room.name,guidelines:room.guidelines}:null,
+    memories:memories.filter(m=>m.scope==='console' || (room && m.room_id===room.id) || (agent && m.agent_id===agent.id)).slice(0,20).map(m=>({kind:m.kind,title:m.title,body:m.body})),
+    apps:apps.filter(a=>!room || a.home_room_id===room.id || appLinks.some(l=>l.app_id===a.id && l.room_id===room.id)).map(a=>({id:a.id,name:a.name,slug:a.slug,kind:a.kind,status:a.status,records:recordsOf(a.id).length})),
+    connections_granted:grantedConnections,
+    response_contract:{output:"string — what happened, with evidence",app:"optional {name,kind:tracker|board|dashboard|form_page|custom,description,fields:[labels],records:[{title,status,values:{}}]} — return this to create/update a living App in the room instead of only answering text. Drafts only for external sends; a human approves publishing."}};
   await supabase.from("dispatches").update({status:'running',started_at:new Date().toISOString(),request_payload:payload,endpoint_snapshot:agent?.endpoint_url||null}).eq("id",dispatch.id);
   await addStep(dispatch.id,1,'dispatch','running',agent?.endpoint_url?'Sending work packet to agent endpoint.':'No endpoint configured.',{});
   await loadDispatches();
@@ -455,8 +877,27 @@ async function executeDispatch(dispatch) {
         if (jacket.room_id===selectedRoomId) { selectedThreadId=t.id; renderThreads(); await loadMessages(); }
       }
     }
-    await loadJackets(); renderJackets(); await loadDispatches();
-    say(`Dispatch completed by ${agent.display_name}. Evidence is recorded; funding remains locked until CP4 verification.`,'ok');
+    let createdApp=null;
+    try {
+      const rawApp = parsed?.app || (Array.isArray(parsed?.apps)?parsed.apps[0]:null);
+      if (rawApp) {
+        createdApp = await createAppFromPayload(rawApp, agent, jacket, dispatch);
+        if (createdApp) {
+          await addStep(dispatch.id,3,'app_create','completed',`Agent returned an App: ${createdApp.name} (${recordsOf(createdApp.id).length} records).`,{app_id:createdApp.id});
+          const t2 = jacket ? await ensureJacketThread(jacket) : null;
+          const threadForCard = t2?.id || selectedThreadId;
+          if (threadForCard) {
+            const asAgent = jacket?.room_id && roomMembers.some(m=>m.agent_id===agent.id);
+            await supabase.from("messages").insert({thread_id:threadForCard,author_profile_id:currentUser.id,author_agent_id:asAgent?agent.id:null,kind:'app_card',body:`app:${createdApp.id}\n${createdApp.name} — ${recordsOf(createdApp.id).length} records · ${createdApp.status}`});
+          }
+        }
+      }
+    } catch(appErr) {
+      try{ await addStep(dispatch.id,3,'app_create','errored',`App payload rejected: ${appErr.message}`,{}); }catch{}
+    }
+    try{ await chargeDispatch(dispatch); }catch{}
+    await loadJackets(); renderJackets(); await loadDispatches(); await loadPlatform();
+    say(`Dispatch completed by ${agent.display_name}.${createdApp?` It built the “${createdApp.name}” App in the room.`:""} Evidence is recorded. Verify it in the Verify tab; funded stays blocked until every required check/stip passes.`,'ok');
   } catch(e) {
     const msg=`Endpoint failed (${e.name}: ${e.message}). It may be offline or blocked by CORS.`;
     await addStep(dispatch.id,2,'agent_response','errored',msg,{});
@@ -471,6 +912,8 @@ async function createDispatch({agentId,instructions,parentId=null,handoffNote=''
   if (jacket.room_id && !roomMembers.some(m=>m.agent_id===agent.id)) throw new Error(`${agent.display_name} is not in this jacket's room yet. Add it on the Agent Lot.`);
   const est=parseInt($("#dispatchCredits").value||'0',10);
   if (jacket.budget_cap_credits>0 && est>jacket.budget_cap_credits) throw new Error('Estimated credits exceed the jacket budget cap.');
+  if (credits.length && creditBalance()<=0) throw new Error('Credit balance is exhausted for this console. Work is paused until credits are replenished (Platform tab).');
+  if (!String(instructions||"").trim()) throw new Error('Write the dispatch instructions first.');
   const { data, error } = await supabase.from("dispatches").insert({jacket_id:jacket.id,agent_id:agent.id,parent_dispatch_id:parentId,dispatched_by:currentUser.id,mode:$("#dispatchMode").value,instructions,handoff_note:handoffNote,estimated_credits:est,endpoint_snapshot:agent.endpoint_url||null,status:'queued'}).select().single();
   if (error) throw error;
   await executeDispatch(data); return data;
@@ -502,6 +945,12 @@ function startRealtime() {
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},async()=>{await loadMessages();})
     .on('postgres_changes',{event:'*',schema:'public',table:'dispatches'},async()=>{await loadDispatches();})
     .on('postgres_changes',{event:'*',schema:'public',table:'job_jackets'},async()=>{await loadJackets();renderJackets();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'apps'},async()=>{await loadPlatform();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'app_records'},async()=>{await loadPlatform();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'verify_checks'},async()=>{await loadVerify();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'stips'},async()=>{await loadVerify();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'approvals'},async()=>{await loadPlatform();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'credit_ledger'},async()=>{await loadPlatform();})
     .subscribe();
 }
 async function init() {
@@ -531,7 +980,7 @@ $("#threadSelect").addEventListener("change",async e=>{selectedThreadId=e.target
 $("#newThreadBtn").addEventListener("click",async()=>{try{if(!selectedRoomId)throw new Error('Select a room first.');const title=prompt('Thread title','Working thread');if(!title)return;const {data,error}=await supabase.from("threads").insert({room_id:selectedRoomId,created_by:currentUser.id,title:title.slice(0,120),anchor_type:'general'}).select().single();if(error)throw error;selectedThreadId=data.id;await loadRoomContext();}catch(e){say(e.message,'err');}});
 $("#sendMessageBtn").addEventListener("click",async()=>{try{if(!selectedThreadId)throw new Error('Create/select a thread first.');const body=$("#messageBody").value.trim();if(!body)throw new Error('Write a message first.');const {error}=await supabase.from("messages").insert({thread_id:selectedThreadId,author_profile_id:currentUser.id,body});if(error)throw error;$("#messageBody").value='';await loadMessages();}catch(e){say(e.message,'err');}});
 
-$("#createJacketBtn").addEventListener("click",async(ev)=>{const b=ev.currentTarget;b.disabled=true;try{await ensureProfile();const payload={console_id:selectedConsoleId,room_id:selectedRoomId||null,created_by:currentUser.id,title:$("#jacketTitle").value.trim(),brief:$("#jacketBrief").value.trim(),acceptance_criteria:$("#jacketAcceptance").value.trim(),budget_cap_credits:parseInt($("#jacketBudget").value||'0',10),visibility:$("#jacketVisibility").value,state:'intake'};if(!payload.title)throw new Error('Jacket needs a title.');const {data,error}=await supabase.from("job_jackets").insert(payload).select().single();if(error)throw error;selectedJacketId=data.id;await ensureJacketThread(data);await loadJackets();renderJackets();await loadDispatches();say(`Job jacket opened: ${payload.title}. It cannot enter funded until CP4 verification exists.`,'ok');}catch(e){say(e.message,'err');}finally{b.disabled=false;}});
+$("#createJacketBtn").addEventListener("click",async(ev)=>{const b=ev.currentTarget;b.disabled=true;try{await ensureProfile();const payload={console_id:selectedConsoleId,room_id:selectedRoomId||null,created_by:currentUser.id,title:$("#jacketTitle").value.trim(),brief:$("#jacketBrief").value.trim(),acceptance_criteria:$("#jacketAcceptance").value.trim(),budget_cap_credits:parseInt($("#jacketBudget").value||'0',10),visibility:$("#jacketVisibility").value,state:'intake'};if(!payload.title)throw new Error('Jacket needs a title.');const {data,error}=await supabase.from("job_jackets").insert(payload).select().single();if(error)throw error;selectedJacketId=data.id;await ensureJacketThread(data);await loadJackets();renderJackets();await loadDispatches();say(`Job jacket opened: ${payload.title}. Add its evidence stip + verification check in the Verify tab.`,'ok');}catch(e){say(e.message,'err');}finally{b.disabled=false;}});
 $("#dispatchBtn").addEventListener("click",async(ev)=>{const b=ev.currentTarget;b.disabled=true;try{await createDispatch({agentId:$("#dispatchAgent").value,instructions:$("#dispatchInstructions").value.trim()});}catch(e){say(e.message,'err');}finally{b.disabled=false;}});
 $("#refreshWorkBtn").addEventListener("click",async()=>{await loadRoomContext();await loadJackets();renderJackets();await loadDispatches();});
 
@@ -551,6 +1000,107 @@ $("#dispatchMentionBtn")?.addEventListener("click",async(ev)=>{
   } catch(e) { say(e.message,'err'); }
   finally { b.disabled=false; }
 });
+
+$("#appName")?.addEventListener("input",()=>{ if(!$("#appSlug").dataset.touched) $("#appSlug").value=slugify($("#appName").value); });
+$("#appSlug")?.addEventListener("input",e=>{ e.target.dataset.touched='1'; e.target.value=slugify(e.target.value); });
+document.querySelectorAll("[data-template]").forEach(b=>b.addEventListener("click",()=>{
+  const t=APP_TEMPLATES[b.dataset.template]; if(!t) return;
+  $("#appName").value=t.name; $("#appSlug").value=slugify(t.name); delete $("#appSlug").dataset.touched;
+  $("#appKind").value=t.kind; $("#appFields").value=t.fields; $("#appDesc").value=t.desc;
+  $("#appCreateBox").open=true; showInspector("apps");
+  say(`Template loaded: ${t.name}. Nothing is created or seeded yet — review, then click Create App. Your records stay your own data.`,'ok');
+}));
+$("#createAppBtn")?.addEventListener("click",async(ev)=>{
+  const b=ev.currentTarget; b.disabled=true;
+  try{
+    await ensureProfile();
+    if(!selectedRoomId) throw new Error("Select a room first — Apps are born inside a room.");
+    const payload={console_id:selectedConsoleId,home_room_id:selectedRoomId,created_by:currentUser.id,name:$("#appName").value.trim(),slug:slugify($("#appSlug").value||$("#appName").value),kind:$("#appKind").value,visibility:$("#appVisibility").value,description:$("#appDesc").value.trim(),fields:parseFields($("#appFields").value),status:'draft'};
+    if(!payload.name||payload.slug.length<2) throw new Error("App needs a name and slug.");
+    const {data,error}=await supabase.from("apps").insert(payload).select().single(); if(error) throw error;
+    selectedAppId=data.id; localStorage.setItem("consoleai_app_id",selectedAppId);
+    await supabase.from("app_links").insert({app_id:data.id,room_id:selectedRoomId,created_by:currentUser.id});
+    await ensureAppView(data, data.kind==="board"?"board":"table");
+    say(`App created (draft): ${data.name}. Add records — editing here updates every linked room/thread.`,'ok');
+    await loadPlatform();
+  }catch(e){ say(e.message,'err'); } finally{ b.disabled=false; }
+});
+$("#seedVerifyBtn")?.addEventListener("click",async()=>{
+  try{
+    const j=byId(jackets,selectedJacketId); if(!j) throw new Error("Select a jacket first.");
+    if (!stips.some(x=>x.required)) { const r=await supabase.from("stips").insert({jacket_id:j.id,created_by:currentUser.id,label:'Evidence attached for this jacket',required:true}); if(r.error) throw r.error; }
+    if (!checks.some(x=>x.required)) { const r=await supabase.from("verify_checks").insert({jacket_id:j.id,created_by:currentUser.id,kind:'acceptance',label:'Evidence reviewed against the acceptance criteria',required:true}); if(r.error) throw r.error; }
+    say('Standard required stip + check are on the jacket. Mark them only when the evidence is real.','ok'); await loadVerify();
+  }catch(e){ say(e.message,'err'); }
+});
+$("#addStipBtn")?.addEventListener("click",async()=>{
+  try{ const j=byId(jackets,selectedJacketId); if(!j) throw new Error("Select a jacket first.");
+    const label=$("#stipLabel").value.trim(); if(!label) throw new Error("Write the stip first.");
+    const {error}=await supabase.from("stips").insert({jacket_id:j.id,created_by:currentUser.id,label,required:true}); if(error) throw error;
+    $("#stipLabel").value=""; await loadVerify();
+  }catch(e){ say(e.message,'err'); }
+});
+$("#addCheckBtn")?.addEventListener("click",async()=>{
+  try{ const j=byId(jackets,selectedJacketId); if(!j) throw new Error("Select a jacket first.");
+    const label=$("#checkLabel").value.trim(); if(!label) throw new Error("Write the check first.");
+    const {error}=await supabase.from("verify_checks").insert({jacket_id:j.id,created_by:currentUser.id,kind:$("#checkKind").value,label,required:true}); if(error) throw error;
+    $("#checkLabel").value=""; await loadVerify();
+  }catch(e){ say(e.message,'err'); }
+});
+$("#tryFundedBtn")?.addEventListener("click",async()=>{
+  try{ const j=byId(jackets,selectedJacketId); if(!j) throw new Error("Select a jacket first.");
+    const {error}=await supabase.from("job_jackets").update({state:'funded'}).eq("id",j.id);
+    if(error) throw error;
+    say(`FUNDED: ${j.title}. The database accepted it because every required check passes and every required stip is satisfied.`,'ok');
+    await loadJackets(); renderJackets(); await loadVerify();
+  }catch(e){ say(`Database refused funded (this is the system working): ${e.message}`,'err'); }
+});
+$("#requestApprovalBtn")?.addEventListener("click",async()=>{
+  try{
+    const kind=$("#approvalKind").value;
+    const title=$("#approvalTitle").value.trim() || (kind==='publish'?'Publish the selected App':kind==='fund'?'Fund the selected jacket':'Approval requested');
+    const payload={console_id:selectedConsoleId,requested_by:currentUser.id,kind,title,
+      jacket_id:selectedJacketId||null, app_id:(kind==='publish'?selectedAppId:null)||null, payload:{note:'Requested from the Approvals inbox. Draft only — approving a send does not send anything by itself.'}};
+    if (kind==='publish' && !payload.app_id) throw new Error("Select an App first (Apps tab).");
+    const {error}=await supabase.from("approvals").insert(payload); if(error) throw error;
+    $("#approvalTitle").value=""; say('Approval requested. It sits pending until a human decides — nothing external was sent.','ok'); await loadPlatform();
+  }catch(e){ say(e.message,'err'); }
+});
+$("#addCreditBtn")?.addEventListener("click",async()=>{
+  try{ const amt=parseInt($("#creditAmount").value||"0",10); if(!amt||amt<=0) throw new Error("Enter a positive test grant.");
+    const {error}=await supabase.from("credit_ledger").insert({console_id:selectedConsoleId,created_by:currentUser.id,entry_kind:'grant',credits:amt,note:$("#creditNote").value.trim()||'Test grant (not a Stripe purchase)',idempotency_key:`manual:${currentUser.id}:${Date.now()}`}); if(error) throw error;
+    say(`Test grant recorded: +${amt} credits. This is a ledger entry only — no card was charged.`,'ok'); await loadPlatform();
+  }catch(e){ say(e.message,'err'); }
+});
+$("#addConnBtn")?.addEventListener("click",async()=>{
+  try{ const name=$("#connName").value.trim(); if(!name) throw new Error("Name the connection first.");
+    const ref=$("#connRef").value.trim();
+    if (/(sk-|ghp_|xox[bap]-|AKIA|-----BEGIN)/.test(ref)) throw new Error("That looks like a raw secret. Store a vault reference only — never the secret itself.");
+    const {error}=await supabase.from("connections").insert({console_id:selectedConsoleId,created_by:currentUser.id,name,kind:$("#connKind").value,status:$("#connStatus").value,auth_ref:ref}); if(error) throw error;
+    $("#connName").value=""; $("#connRef").value=""; say(`Connection registered: ${name}. Grant it to agents below. OAuth into the real account is not performed here.`,'ok'); await loadPlatform();
+  }catch(e){ say(e.message,'err'); }
+});
+$("#createAutoBtn")?.addEventListener("click",async()=>{
+  try{ const name=$("#autoName").value.trim(); if(!name) throw new Error("Name the automation first.");
+    const app=byId(apps,selectedAppId);
+    const {error}=await supabase.from("automations").insert({console_id:selectedConsoleId,room_id:selectedRoomId||null,app_id:app?.id||null,jacket_id:selectedJacketId||null,agent_id:$("#autoAgent").value||null,created_by:currentUser.id,name,trigger_kind:$("#autoTrigger").value,schedule_cron:$("#autoCron").value.trim(),instructions:$("#autoInstructions").value.trim(),status:'draft'}); if(error) throw error;
+    say(`Automation saved as a draft: ${name}. “Run now” performs a real dispatch; schedules are recorded until a background runner exists.`,'ok'); await loadPlatform();
+  }catch(e){ say(e.message,'err'); }
+});
+$("#addMemBtn")?.addEventListener("click",async()=>{
+  try{ const title=$("#memTitle").value.trim(); if(!title) throw new Error("Give the memory a title.");
+    const {error}=await supabase.from("memories").insert({console_id:selectedConsoleId,room_id:selectedRoomId||null,created_by:currentUser.id,kind:$("#memKind").value,scope:selectedRoomId?'room':'console',title,body:$("#memBody").value.trim()}); if(error) throw error;
+    $("#memTitle").value=""; $("#memBody").value=""; say('Memory saved. It rides along in future dispatch work packets for this room/console.','ok'); await loadPlatform();
+  }catch(e){ say(e.message,'err'); }
+});
+$("#addFileBtn")?.addEventListener("click",async()=>{
+  try{ const name=$("#fileName").value.trim(); const url=$("#fileUrl").value.trim();
+    if(!name) throw new Error("Name the file first."); if(url && !/^https:\/\//i.test(url)) throw new Error("File link must be an https URL.");
+    const {error}=await supabase.from("files").insert({console_id:selectedConsoleId,room_id:selectedRoomId||null,jacket_id:selectedJacketId||null,app_id:selectedAppId||null,created_by:currentUser.id,name,external_url:url||null,kind:$("#fileKind").value}); if(error) throw error;
+    $("#fileName").value=""; $("#fileUrl").value=""; say('File link attached as evidence metadata.','ok'); await loadPlatform();
+  }catch(e){ say(e.message,'err'); }
+});
+$("#refreshWorkBtn")?.addEventListener("click",async()=>{ await loadPlatform(); });
 
 init();
 </script>

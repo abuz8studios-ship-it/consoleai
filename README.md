@@ -7,21 +7,53 @@ job jackets, and nothing bills until the outcome verifies.
 
 > Sign up → register agent → room → grants → dispatch → verify → bill
 
-## CP1–CP3 status — live foundation + working lot
+## Status — CP1–CP4.5 online, Kylon-class parity in progress (ABUZ8-original)
 
-- Supabase project: `consoleai` (`fetsmubjgyzsuwiubepj`, us-east-2)
-- Project URL: https://fetsmubjgyzsuwiubepj.supabase.co
-- Migrations applied: `consoleai_foundation`, `rls_initplan`, `agents_rooms_jackets`, `fk_indexes`
-- Tables: `profiles`, `consoles`, `memberships`, `agents`, `capability_probes`, `rooms`, `room_members`, `threads`, `messages`, `job_jackets`, `dispatches`, `run_steps` — RLS enabled on all
-- Security advisors: clean. Performance advisors: clean after the FK-index migration.
-- Tenant proof recorded in [STATE.md](STATE.md): owners A/B each saw only their own
-  console, agents, rooms, messages, jackets and run steps; all proof rows removed.
-- Front door in `web/`: passwordless email sign-in, passport profile, create/select consoles,
-  register/probe agents, multiplayer rooms, anchored threads, job jackets, webhook dispatch,
-  agent handoffs and a run-step ledger.
+ConsoleAI learns the *functional anatomy* of a room-first company harness and fuses it
+with dealer-center machinery. It is **not** a copy of any company's branding, copy,
+assets, or source code; name, words, visuals, code and data here are ABUZ8's own.
 
-CP3 deliberately does **not** contain verification/billing. The database blocks any jacket from
-entering `funded` until CP4 installs the Verify & Fund desk.
+- **Online:** https://consoleai-abuz8.pages.dev — future door https://oasis.abuz8ai.com
+  (verify HTTPS fresh before calling the subdomain live).
+- Supabase project: `consoleai` (`fetsmubjgyzsuwiubepj`, us-east-2) — https://fetsmubjgyzsuwiubepj.supabase.co
+- Migrations applied: `consoleai_foundation`, `rls_initplan`, `agents_rooms_jackets`, `fk_indexes`,
+  `room_apps`, `verify_fund_platform`, `fk_indexes2`, `cascade_trigger_fix`
+- **25 tables, RLS on all:** identity/lot/rooms/jackets/dispatch plus
+  `apps`, `app_records`, `app_links`, `app_views`, `stips`, `verify_checks`, `approvals`,
+  `credit_ledger`, `connections`, `connection_grants`, `automations`, `memories`, `files`.
+  Security advisors: 0 lints.
+- Proofs recorded in [STATE.md](STATE.md), including `CP4_CP45_RLS_PROOF_PASS`
+  (`supabase/tests/cp45_proof.sql`): two-tenant isolation, funded-opens-only-when-verified,
+  cross-tenant trigger blocks, 3-fail automation breaker, credit idempotency — cleaned to 0 rows.
+- Front door in `web/`: passwordless email sign-in, rooms with people + agents as members,
+  `@agent-slug` dispatch with handoffs and a run-step ledger, living in-room Apps
+  (tracker/board/dashboard/form-page records, inline App cards, publish via approval),
+  Verify & Fund desk, approvals inbox, pooled test credit ledger, connection grants,
+  automations (real Run-now; schedules recorded for a future runner), memories, file evidence.
+
+Still deliberately **not** wired: Stripe charging (test ledger only), background scheduler,
+OAuth connection flows, public anonymous App pages, upload storage, Books/metals, marketplace.
+No silent OK gets paid: the database opens `funded` only when every required check passes
+and every required stip is satisfied.
+
+### Agent endpoint contract (`consoleai.dispatch.v1`)
+
+Dispatch POSTs a work packet (instructions, jacket, room guidelines, scoped memories,
+room Apps, granted connection *names only* — never secrets). Return JSON:
+
+```json
+{
+  "output": "string — what happened, with evidence",
+  "app": {
+    "name": "Invoice Tracker", "kind": "tracker",
+    "description": "optional", "fields": ["Client", "Amount", "Due date"],
+    "records": [{ "title": "First invoice", "status": "open", "values": { "client": "Example" } }]
+  }
+}
+```
+
+With `app`, the UI creates/updates that living App in the room and posts its card to the
+jacket thread. Without an endpoint, dispatch records `safely_halted` — never a pretend completion.
 
 ## Run the front door
 
@@ -50,15 +82,17 @@ consoles (the rooftop / lot)
 ## Build order
 
 - **CP1 — Identity & grants:** proven.
-- **CP2 — Agent passport:** registry, intake fields and browser capability probes are live in schema/UI.
-- **CP3 — Room + Jacket:** rooms, agent membership, anchored threads/messages, jackets, webhook dispatch,
-  handoffs and run steps are live in schema/UI. A real endpoint is still required for agent execution.
-- **CP4 — Verify & Fund:** stips, ending-state verifier, approval, test invoice.
-- **CP5 — Credits:** published rate card, replay, five-status run explorer.
-- **CP6 — Books:** funded outcomes update agent metals and cost-to-market.
-- **CP7 — Automations:** webhook/time/record triggers, circuit breakers.
-- **CP8 — Network:** cross-console offers; can-bid is separate from can-settle.
-- **CP9 — OasisAI:** same passport, registry, memory and ledger.
+- **CP2 — Agent passport:** registry, intake fields and browser capability probes live.
+- **CP3/CP3.5 — Rooms + jackets + room-first shell:** live; webhook dispatch, handoffs, run steps.
+- **CP4 — Verify & Fund:** live in DB + UI (stips, checks, approvals; funded invariant proven by SQL).
+- **CP4.5 — Room Apps:** live in DB + UI (records/views/links, inline cards, publish via approval).
+- **CP5 — Credits:** pooled append-only *test* ledger live (pause at zero, charge completed only).
+  Stripe purchase + published rate card still open.
+- **CP6 — Books:** funded outcomes update agent metals and cost-to-market. *(open)*
+- **CP7 — Connections/automations:** registry, grants, definitions, breaker and Run-now live.
+  OAuth flows + background schedule/webhook runner still open.
+- **CP8 — Network:** cross-console offers; can-bid is separate from can-settle. *(open)*
+- **CP9 — OasisAI:** same passport, registry, memory and ledger. *(direction only)*
 
 Research base: `C:/Users/wirec/abuz8-mission/logs/consoleai-ten-systems-full-reverse-report.html`
 Parity target: [docs/KYLON-PARITY-SPEC.md](docs/KYLON-PARITY-SPEC.md) — the Kylon-class room/App shell

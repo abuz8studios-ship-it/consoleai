@@ -1,0 +1,23 @@
+-- ConsoleAI: FK covering indexes for CP4/CP4.5 tables (advisor-driven).
+create index if not exists app_links_creator_idx on public.app_links(created_by);
+create index if not exists app_records_agent_idx on public.app_records(created_by_agent);
+create index if not exists app_records_dispatch_idx on public.app_records(source_dispatch_id);
+create index if not exists app_views_creator_idx on public.app_views(created_by);
+create index if not exists approvals_app_idx on public.approvals(app_id);
+create index if not exists approvals_decided_idx on public.approvals(decided_by);
+create index if not exists approvals_dispatch_idx on public.approvals(dispatch_id);
+create index if not exists approvals_requested_idx on public.approvals(requested_by);
+create index if not exists apps_agent_idx on public.apps(created_by_agent);
+create index if not exists apps_dispatch_idx on public.apps(source_dispatch_id);
+create index if not exists automations_app_idx on public.automations(app_id);
+create index if not exists automations_creator_idx on public.automations(created_by);
+create index if not exists automations_jacket_idx on public.automations(jacket_id);
+create index if not exists connection_grants_creator_idx on public.connection_grants(created_by);
+create index if not exists connections_creator_idx on public.connections(created_by);
+create index if not exists credit_ledger_creator_idx on public.credit_ledger(created_by);
+create index if not exists credit_ledger_jacket_idx on public.credit_ledger(jacket_id);
+create index if not exists files_app_idx on public.files(app_id);
+create index if not exists files_creator_idx on public.files(created_by);
+create index if not exists memories_creator_idx on public.memories(created_by);
+create index if not exists stips_satisfied_idx on public.stips(satisfied_by);
+create index if not exists verify_checks_checked_idx on public.verify_checks(checked_by);

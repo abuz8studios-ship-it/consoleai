@@ -61,14 +61,61 @@ Updated: 2026-10-16
   magic link), a real agent endpoint run from the UI, inline App records,
   Kylon parity. The parity checklist in `docs/KYLON-PARITY-SPEC.md` stays unchecked.
 
+## Online build — CP4 Verify & Fund + CP4.5 Room Apps + platform: DB PROVEN, UI DEPLOYED ONLINE
+
+Built 2026-10-16 evening at CHO order ("you don't need the home server — build online").
+Functional-parity discipline kept: ABUZ8-original name, copy, visuals, code and data;
+nothing copied from Kylon's branding, text, assets or source.
+
+- **Online front door (new, separate from abuz8ai.com):** Cloudflare Pages project
+  `consoleai-abuz8` → https://consoleai-abuz8.pages.dev (HTTP 200, headless DOM
+  "Backend reachable. Signed out"). Custom domain `oasis.abuz8ai.com`: DNS CNAME
+  created and Pages domain added (status was `initializing`, certificate pending
+  at attach time) — re-verify HTTPS before calling it live.
+- Migrations applied remotely: `room_apps`, `verify_fund_platform`, `fk_indexes2`,
+  `cascade_trigger_fix`. Public schema is now **25 RLS tables**: the CP1–CP3 twelve plus
+  apps/app_records/app_links/app_views, stips/verify_checks/approvals, credit_ledger,
+  connections/connection_grants, automations, memories, files. Security advisors: 0 lints.
+  Performance: FK-covering indexes added; "unused index" INFOs remain on empty tables.
+- **Funding invariant is real now:** `funded` opens only with ≥1 required check, every
+  required check `pass`, and every required stip satisfied (replaces the CP4-reserve block).
+- **Proof:** `supabase/tests/cp45_proof.sql` executed live → `CP4_CP45_RLS_PROOF_PASS`,
+  cleanup 0 rows. It proved: funded blocked → blocked on stip → opens when satisfied;
+  A sees own apps/records/credits/approvals, B sees 0 of A's; cross-console app links and
+  connection grants rejected by triggers; automation 3-fail breaker pauses; credit
+  idempotency rejects duplicates (balance 95). The proof first caught a real cascade
+  validator bug (fixed in `cascade_trigger_fix`) and uses child-first cleanup like CP2+CP3.
+- UI (`web/index.html`, single file): real Apps (templates for tracker/board/dashboard/
+  form page with **no seeded fake data**, fields, table/board/dashboard views, record
+  add/move/delete, link to rooms, anchored App threads, inline App cards in the timeline,
+  publish-through-approval), Verify tab (stips/checks + "Try move to funded" showing the
+  database's exact refusal), Approvals inbox (publish/fund actions execute on approval),
+  Platform tab (test credit ledger with pause-at-zero + charge-on-completed-dispatch,
+  connection registry + per-agent grants with secret-pattern refusal, automations with
+  real Run-now dispatch, memories riding in work packets, file evidence links).
+- **Agent → App contract:** every dispatch sends `consoleai.dispatch.v1` with room
+  guidelines, scoped memories, room Apps and granted connection *names only*. An endpoint
+  may return `{output, app:{name,kind,fields,records[]}}`; the UI then creates/updates
+  that App + records and posts a living App card to the jacket thread.
+- Honest limits still open: no signed-in browser journey recorded yet (0 real users/rows),
+  no real agent endpoint has returned an App from the UI, Stripe charging is NOT wired
+  (test ledger only), no background scheduler/webhook runner, no OAuth connection flows
+  (registry + grants only), no public anonymous App pages, no file-upload storage,
+  no Books/metals (CP6), no marketplace (CP8), no mobile/desktop apps, console
+  hard-delete still needs child-first ordering. Supabase Auth redirect allowlist may
+  need the online URLs added in the dashboard for magic links.
+
 ## Not built yet — do not claim
 
 - A connected real agent endpoint used from the browser (Hermes/Pegasus wiring is separate)
-- Verify & Fund desk, Stripe funding (CP4/CP5)
+- Signed-in end-user journey proof (schema/RLS/UI deployed; first real sign-in still owed)
+- Stripe funding/purchases (credit ledger is test-grant only today)
+- Background automation runner (schedule/webhook/record triggers are recorded definitions; Run-now dispatch is real)
+- OAuth/one-click connections into external services (registry + grants only)
+- Public anonymous App pages and file-upload storage
 - Agent book values/metals (CP6)
-- Automations and cross-console marketplace (CP7/CP8)
+- Cross-console marketplace (CP8)
 - OasisAI beyond shared identity direction (CP9)
-- Custom domain / public deployment
 - Pegasus GPU command. At CP1 save time Pegasus was online on Tailscale with SSH
   port open, but Amanecer's key returned Permission denied as user `wirec`.
 
@@ -77,3 +124,5 @@ Updated: 2026-10-16
 - Supabase API: https://fetsmubjgyzsuwiubepj.supabase.co
 - Supabase dashboard project: https://supabase.com/dashboard/project/fetsmubjgyzsuwiubepj
 - Local front door while developing: http://127.0.0.1:8000
+- Online front door: https://consoleai-abuz8.pages.dev (Cloudflare Pages project `consoleai-abuz8`)
+- Future public door: https://oasis.abuz8ai.com (DNS + Pages domain attached 2026-10-16; call it live only after a fresh HTTPS curl)
