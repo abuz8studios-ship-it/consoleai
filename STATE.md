@@ -38,6 +38,29 @@ Updated: 2026-10-16
   record `errored`; only an HTTP success can record `completed`. First real signed-in
   user journey still needs CHO to open the local page and use the email magic link.
 
+## CP3.5 slice 1 — Room-first shell: DOM + SIGNED-OUT PROVEN, SIGNED-IN UNPROVEN
+
+- `web/index.html` workspace is now a 3-pane shell (existing 12 tables only):
+  left rail (lot search filter, Rooms, Agents, Job Jackets; create forms in
+  collapsibles), center room pane (room header/members, anchored thread picker,
+  message timeline, `@agent-slug` composer with live target line and an explicit
+  "Dispatch @mention on selected jacket" action), right inspector with
+  Jacket / Runs / Members / Apps tabs. Runs tab holds the proven dispatch desk.
+- Every CP2/CP3 element ID and JS function was preserved (no duplicate/missing
+  IDs); dispatch honesty is unchanged (no endpoint → `safely_halted`).
+  `@mention` sets the dispatch agent and says plainly whether that agent is a
+  room member; it never pretends a message alone dispatched work.
+- Apps tab is an honest empty state: `apps`/`app_records` (CP4.5) do not exist
+  yet. Funding remains blocked until CP4.
+- Fresh proof (2026-10-16 evening): inline JS `node --check` PASS; local HTTP
+  200 (53,659 B); headless-Chrome DOM = "Backend reachable. Signed out — request
+  a magic link to enter." (init + all listeners resolved); shell markers present
+  in DOM; signed-out screenshot clean (`docs/cp35-slice1-render.png`,
+  sha256 `1f5ccaa9caa24ebfa06046d0bf382e8cbc4f78a35162a11fffe5b5d57d84b336`).
+- NOT proven yet: a signed-in browser journey through the new shell (needs CHO's
+  magic link), a real agent endpoint run from the UI, inline App records,
+  Kylon parity. The parity checklist in `docs/KYLON-PARITY-SPEC.md` stays unchecked.
+
 ## Not built yet — do not claim
 
 - A connected real agent endpoint used from the browser (Hermes/Pegasus wiring is separate)

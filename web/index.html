@@ -12,13 +12,26 @@ header{padding:30px clamp(18px,5vw,64px) 16px;border-bottom:1px solid var(--line
 h1{font-family:Georgia,serif;font-size:clamp(2.2rem,5vw,4.3rem);line-height:.98;margin:.18em 0;color:white}h1 em{color:var(--gold2);font-style:normal}.sub{max-width:900px;color:var(--muted)}.flow{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:18px 0 4px}.flow span{background:#123052;border:1px solid #2c5c87;border-radius:999px;padding:5px 9px;font-size:.8rem}.flow i{color:var(--gold);font-style:normal}
 main{max-width:1500px;margin:0 auto;padding:22px}.grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:18px}.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 16px 45px rgba(0,0,0,.2)}h2{font-family:Georgia,serif;margin:0 0 10px;color:white;font-size:1.55rem}h3{color:white;margin:20px 0 8px}label{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold2);font-weight:700;margin:12px 0 5px}input,select,textarea{width:100%;padding:10px 11px;border-radius:10px;border:1px solid #335a80;background:#071527;color:white;font:inherit}textarea{resize:vertical}input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:2px}button{border:0;border-radius:10px;padding:9px 13px;font-weight:800;cursor:pointer;background:var(--gold);color:#111827}button.secondary{background:#17385d;color:var(--text);border:1px solid var(--line)}button.small{padding:6px 9px;font-size:.8rem}button:disabled{opacity:.5;cursor:wait}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.status{padding:12px;border:1px solid var(--line);background:#071527;border-radius:10px;color:var(--muted);white-space:pre-wrap;min-height:52px}.ok{color:var(--green)}.err{color:var(--red)}.muted{color:var(--muted)}.hidden{display:none!important}.pill{font-size:.7rem;background:#17385d;padding:3px 8px;border-radius:999px;color:#aee8da;white-space:nowrap}.pill.gold{color:#ffe9a5}.pill.red{color:#ffc2bb}.pill.green{color:#aaf0c4}
 .selectable{border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#0a1b30;cursor:pointer}.selectable:hover{border-color:var(--teal)}.selectable.active{border-color:var(--gold);background:#122b4b}.item{border:1px solid var(--line);border-radius:12px;padding:13px;margin:9px 0;background:#0a1b30}.item-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.item h4{margin:0;color:#fff}.workspace{display:grid;grid-template-columns:.9fr 1.2fr 1fr;gap:18px;align-items:start;margin-top:18px}.stack{display:grid;gap:18px}.messages{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:10px;background:#071527}.msg{padding:9px 10px;border-bottom:1px solid #1b3553}.msg:last-child{border-bottom:0}.msg .meta{font-size:.72rem;color:var(--dim)}.msg.agent{background:rgba(36,184,161,.06)}.proof{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}.proof div{border:1px solid var(--line);border-radius:12px;padding:14px;background:#0a1b30}.proof b{color:var(--gold2);display:block;margin-bottom:5px}footer{color:var(--muted);text-align:center;padding:28px}.empty{border:1px dashed var(--line);border-radius:12px;padding:14px;color:var(--muted)}
-@media(max-width:1100px){.workspace{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.proof{grid-template-columns:1fr 1fr}}
+.shell{display:grid;grid-template-columns:320px minmax(0,1fr) 380px;gap:14px;align-items:start;margin-top:16px}
+.rail,.roompane,.inspector{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 16px 45px rgba(0,0,0,.2)}
+.rail,.inspector{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+.roompane{min-height:70vh;display:flex;flex-direction:column;gap:10px}
+.roompane .messages{max-height:none;min-height:340px;flex:1}
+.railsec{border-bottom:1px solid #1b3553;padding:10px 0 14px}.railsec:last-child{border-bottom:0}
+.railhead h3{margin:0 0 6px}.createbox{border:1px dashed var(--line);border-radius:12px;padding:10px;margin-top:10px}
+.createbox summary{cursor:pointer;color:var(--gold2);font-weight:800}
+.roomhead h2{margin:0}.mentionbar{border:1px solid var(--line);background:#071527;border-radius:10px;padding:9px 11px;color:var(--muted);font-size:.9rem}
+.composer{border-top:1px solid var(--line);padding-top:10px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.tab{background:#17385d;color:var(--text);border:1px solid var(--line);padding:7px 10px}
+.tab.active{background:var(--gold);color:#111827}.insp-panel h3{margin-top:4px}
+@media(max-width:1100px){.shell{grid-template-columns:1fr 1fr}.roompane{grid-column:1/-1;order:-1}.rail,.inspector{position:static;max-height:none}.workspace{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.proof{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.shell{grid-template-columns:1fr}}
 @media(max-width:760px){.workspace,.proof{grid-template-columns:1fr}main{padding:14px}}
 </style>
 </head>
 <body>
 <header>
-  <div class="brand">ABUZ8 · ConsoleAI CP2 + CP3</div>
+  <div class="brand">ABUZ8 · ConsoleAI CP3.5 slice 1 — room shell (not parity yet)</div>
   <h1>People + agents.<br><em>One lot.</em></h1>
   <p class="sub">Register an agent passport, bring it into a multiplayer room, open a job jacket, dispatch real work to its endpoint, hand the result to the next agent, and keep every step as evidence. Payments stay locked until CP4's Verify &amp; Fund desk exists.</p>
   <div class="flow"><span>Sign up</span><i>→</i><span>Register agent</span><i>→</i><span>Room</span><i>→</i><span>Grants</span><i>→</i><span>Dispatch</span><i>→</i><span>Evidence</span><i>→</i><span>Verify (CP4)</span></div>
@@ -65,64 +78,88 @@ main{max-width:1500px;margin:0 auto;padding:22px}.grid{display:grid;grid-templat
       <span id="workspaceMeta" class="pill gold"></span>
     </div>
 
-    <div class="workspace">
-      <div class="stack">
-        <section class="card">
-          <h2>Agent lot</h2>
-          <p class="muted">Register Hermes, Claude Code, Codex, Devin, an MCP agent, or your own webhook. Secrets never belong here—only a public endpoint reference.</p>
-          <label for="agentName">Agent name</label><input id="agentName" placeholder="Hermes Builder">
-          <label for="agentSlug">Agent slug</label><input id="agentSlug" placeholder="hermes-builder">
-          <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
-            <div><label for="agentKind">Kind</label><select id="agentKind"><option value="hermes">Hermes</option><option value="claude_code">Claude Code</option><option value="codex">Codex</option><option value="devin">Devin</option><option value="custom_webhook">Custom webhook</option><option value="mcp">MCP</option><option value="local">Local</option><option value="other">Other</option></select></div>
-            <div><label for="agentVisibility">Visibility</label><select id="agentVisibility"><option value="private">Private to me/admins</option><option value="console">Whole console</option></select></div>
-          </div>
-          <label for="agentModel">Brain / model</label><input id="agentModel" placeholder="e.g. Hermes + Grok, Sonnet, local GGUF">
-          <label for="agentSpecialty">Specialty</label><input id="agentSpecialty" placeholder="Builds and verifies web apps">
-          <label for="agentCapabilities">Capabilities (comma separated)</label><input id="agentCapabilities" placeholder="code, research, browser, writing">
-          <label for="agentEndpoint">Dispatch endpoint (optional HTTPS webhook)</label><input id="agentEndpoint" type="url" placeholder="https://your-agent.example/run">
-          <label for="agentInstructions">Standing instructions</label><textarea id="agentInstructions" rows="4" placeholder="How should this agent work in this console?"></textarea>
-          <div class="row" style="margin-top:14px"><button id="registerAgentBtn" type="button">Register agent passport</button></div>
-          <div id="agentList" style="margin-top:12px"></div>
-        </section>
-      </div>
+    <div class="shell">
+      <aside class="rail" aria-label="Rooms agents and jackets">
+        <div class="railsec">
+          <label for="shellSearch">Search the lot</label>
+          <input id="shellSearch" type="search" placeholder="Filter rooms, agents, jackets…">
+        </div>
+        <div class="railsec">
+          <div class="railhead"><h3>Rooms</h3></div>
+          <div id="roomList" style="margin-top:6px"></div>
+          <details class="createbox"><summary>Open a room</summary>
+            <label for="roomName">Room name</label><input id="roomName" placeholder="Build Room">
+            <label for="roomSlug">Room slug</label><input id="roomSlug" placeholder="build-room">
+            <label for="roomGuidelines">Guidelines injected into work (max 4,096)</label><textarea id="roomGuidelines" rows="3" maxlength="4096" placeholder="Proof or it didn't happen. One owner per job."></textarea>
+            <label for="roomDefaultAgent">Default agent</label><select id="roomDefaultAgent"><option value="">No default</option></select>
+            <div class="row" style="margin-top:14px"><button id="createRoomBtn" type="button">Open room</button></div>
+          </details>
+        </div>
+        <div class="railsec">
+          <div class="railhead"><h3>Agents on the lot</h3></div>
+          <p class="muted">Mention an agent as <code>@slug</code> in the composer. Private agents stay private until shared (RLS).</p>
+          <div id="agentList" style="margin-top:6px"></div>
+          <details class="createbox"><summary>Register an agent</summary>
+            <p class="muted">Register Hermes, Claude Code, Codex, Devin, an MCP agent, or your own webhook. Secrets never belong here — only a public endpoint reference.</p>
+            <label for="agentName">Agent name</label><input id="agentName" placeholder="Hermes Builder">
+            <label for="agentSlug">Agent slug</label><input id="agentSlug" placeholder="hermes-builder">
+            <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
+              <div><label for="agentKind">Kind</label><select id="agentKind"><option value="hermes">Hermes</option><option value="claude_code">Claude Code</option><option value="codex">Codex</option><option value="devin">Devin</option><option value="custom_webhook">Custom webhook</option><option value="mcp">MCP</option><option value="local">Local</option><option value="other">Other</option></select></div>
+              <div><label for="agentVisibility">Visibility</label><select id="agentVisibility"><option value="private">Private to me/admins</option><option value="console">Whole console</option></select></div>
+            </div>
+            <label for="agentModel">Brain / model</label><input id="agentModel" placeholder="e.g. Hermes + Grok, Sonnet, local GGUF">
+            <label for="agentSpecialty">Specialty</label><input id="agentSpecialty" placeholder="Builds and verifies web apps">
+            <label for="agentCapabilities">Capabilities (comma separated)</label><input id="agentCapabilities" placeholder="code, research, browser, writing">
+            <label for="agentEndpoint">Dispatch endpoint (optional HTTPS webhook)</label><input id="agentEndpoint" type="url" placeholder="https://your-agent.example/run">
+            <label for="agentInstructions">Standing instructions</label><textarea id="agentInstructions" rows="4" placeholder="How should this agent work in this console?"></textarea>
+            <div class="row" style="margin-top:14px"><button id="registerAgentBtn" type="button">Register agent passport</button></div>
+          </details>
+        </div>
+        <div class="railsec">
+          <div class="railhead"><h3>Job jackets</h3></div>
+          <div id="jacketList" style="margin-top:6px"></div>
+          <details class="createbox"><summary>Open a jacket</summary>
+            <label for="jacketTitle">Title</label><input id="jacketTitle" placeholder="Build the first working slice">
+            <label for="jacketBrief">Brief</label><textarea id="jacketBrief" rows="4" placeholder="What done means, in plain words."></textarea>
+            <label for="jacketAcceptance">Acceptance criteria</label><textarea id="jacketAcceptance" rows="3" placeholder="Evidence required before this can ever be funded."></textarea>
+            <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
+              <div><label for="jacketBudget">Budget cap (credits)</label><input id="jacketBudget" type="number" min="0" value="10"></div>
+              <div><label for="jacketVisibility">Visibility</label><select id="jacketVisibility"><option value="room">Room members</option><option value="console">Whole console</option></select></div>
+            </div>
+            <div class="row" style="margin-top:14px"><button id="createJacketBtn" type="button">Open jacket</button></div>
+          </details>
+        </div>
+      </aside>
 
-      <div class="stack">
-        <section class="card">
-          <h2>Rooms</h2>
-          <label for="roomName">Room name</label><input id="roomName" placeholder="Build Room">
-          <label for="roomSlug">Room slug</label><input id="roomSlug" placeholder="build-room">
-          <label for="roomGuidelines">Guidelines injected into work (max 4,096)</label><textarea id="roomGuidelines" rows="3" maxlength="4096" placeholder="Proof or it didn't happen. One owner per job."></textarea>
-          <label for="roomDefaultAgent">Default agent</label><select id="roomDefaultAgent"><option value="">No default</option></select>
-          <div class="row" style="margin-top:14px"><button id="createRoomBtn" type="button">Open room</button></div>
-          <div id="roomList" style="margin-top:12px"></div>
-          <div id="roomMembers" class="muted" style="margin-top:10px"></div>
-        </section>
-
-        <section class="card">
+      <section class="roompane" aria-label="Room timeline">
+        <div class="roomhead">
           <h2 id="roomTitle">Conversation</h2>
-          <div class="row"><select id="threadSelect" style="flex:1"></select><button id="newThreadBtn" class="secondary" type="button">New thread</button></div>
-          <div id="messageList" class="messages" style="margin-top:12px"><p class="muted">Select a room.</p></div>
-          <label for="messageBody">Message</label><textarea id="messageBody" rows="3" placeholder="Talk to people and agents in this room…"></textarea>
-          <div class="row" style="margin-top:10px"><button id="sendMessageBtn" type="button">Send message</button><span class="muted">Agent outputs land here as evidence-bearing messages.</span></div>
-        </section>
-      </div>
+          <div id="roomMembers" class="muted" style="margin-top:6px"></div>
+        </div>
+        <div class="row"><select id="threadSelect" style="flex:1" aria-label="Thread"></select><button id="newThreadBtn" class="secondary" type="button">New thread</button></div>
+        <div id="messageList" class="messages"><p class="muted">Select a room.</p></div>
+        <div class="composer">
+          <div id="mentionTarget" class="mentionbar">No @agent targeted. Unnamed messages stay human messages; dispatch is explicit.</div>
+          <label for="messageBody">Message — type @agent-slug to target an agent</label>
+          <textarea id="messageBody" rows="3" placeholder="@hermes-builder build the first slice and return proof…"></textarea>
+          <div class="row" style="margin-top:10px"><button id="sendMessageBtn" type="button">Send message</button><button id="dispatchMentionBtn" class="secondary" type="button">Dispatch @mention on selected jacket</button></div>
+          <p class="muted">“Dispatch @mention” uses the selected jacket and the inspector’s mode/credit estimate. No endpoint means <b>safely halted</b>, never a pretend completion. Agent outputs land in the jacket thread as evidence-bearing messages.</p>
+        </div>
+      </section>
 
-      <div class="stack">
-        <section class="card">
-          <h2>Job jackets</h2>
-          <label for="jacketTitle">Title</label><input id="jacketTitle" placeholder="Build the first working slice">
-          <label for="jacketBrief">Brief</label><textarea id="jacketBrief" rows="4" placeholder="What done means, in plain words."></textarea>
-          <label for="jacketAcceptance">Acceptance criteria</label><textarea id="jacketAcceptance" rows="3" placeholder="Evidence required before this can ever be funded."></textarea>
-          <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
-            <div><label for="jacketBudget">Budget cap (credits)</label><input id="jacketBudget" type="number" min="0" value="10"></div>
-            <div><label for="jacketVisibility">Visibility</label><select id="jacketVisibility"><option value="room">Room members</option><option value="console">Whole console</option></select></div>
-          </div>
-          <div class="row" style="margin-top:14px"><button id="createJacketBtn" type="button">Open jacket</button></div>
-          <div id="jacketList" style="margin-top:12px"></div>
-        </section>
-
-        <section class="card">
-          <h2>Dispatch desk</h2>
+      <aside class="inspector" aria-label="Inspector">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-insp="jacket" type="button">Jacket</button>
+          <button class="tab" data-insp="runs" type="button">Runs</button>
+          <button class="tab" data-insp="members" type="button">Members</button>
+          <button class="tab" data-insp="apps" type="button">Apps</button>
+        </div>
+        <div class="insp-panel" data-panel="jacket">
+          <h3>Selected jacket</h3>
+          <div id="inspectorJacket" class="empty">Select a jacket in the left rail.</div>
+        </div>
+        <div class="insp-panel hidden" data-panel="runs">
+          <h3>Dispatch desk</h3>
           <p class="muted">Dispatch posts the standard ConsoleAI work packet to the agent endpoint and records every step. No endpoint means <b>safely halted</b>, never a pretend completion.</p>
           <label for="dispatchAgent">Agent</label><select id="dispatchAgent"></select>
           <label for="dispatchMode">Mode</label><select id="dispatchMode"><option value="deterministic">Deterministic</option><option value="ai_step">AI step</option><option value="agentic">Agentic</option></select>
@@ -130,15 +167,23 @@ main{max-width:1500px;margin:0 auto;padding:22px}.grid{display:grid;grid-templat
           <label for="dispatchCredits">Estimated credits</label><input id="dispatchCredits" type="number" min="0" value="1">
           <div class="row" style="margin-top:14px"><button id="dispatchBtn" type="button">Dispatch now</button><button id="refreshWorkBtn" class="secondary" type="button">Refresh work</button></div>
           <div id="dispatchList" style="margin-top:12px"></div>
-        </section>
-      </div>
+        </div>
+        <div class="insp-panel hidden" data-panel="members">
+          <h3>Room members</h3>
+          <div id="inspectorMembers" class="empty">Select a room.</div>
+        </div>
+        <div class="insp-panel hidden" data-panel="apps">
+          <h3>Room Apps</h3>
+          <div class="empty">No Apps yet — honestly. Inline record Apps are CP4.5: the <code>apps</code>/<code>app_records</code> tables do not exist in the database yet. In this slice, job jackets and run steps are the living records; nothing here is faked.</div>
+        </div>
+      </aside>
     </div>
   </section>
 
   <section class="proof">
     <div><b>CP1 PROVEN</b>Identity, consoles, memberships and RLS tenant isolation.</div>
     <div><b>CP2 LIVE</b>Agent passports, endpoint registration and browser capability probes.</div>
-    <div><b>CP3 LIVE</b>Rooms, agent members, anchored threads, jackets, dispatch, handoffs and run steps.</div>
+    <div><b>CP3.5 SLICE 1</b>Room-first shell: left rail, room timeline, @mention composer, right Jacket/Runs/Members/Apps inspector. Apps + verify/fund are CP4.5/CP4 — not built yet.</div>
     <div><b>STILL LOCKED</b>Funding state is blocked in the database until CP4 verification exists. No silent OK gets paid.</div>
   </section>
 </main>
@@ -176,6 +221,54 @@ async function loadProfile() {
   if (data?.display_name) $("#displayName").value = data.display_name;
 }
 
+
+function showInspector(name) {
+  document.querySelectorAll("[data-insp]").forEach(b=>b.classList.toggle("active", b.dataset.insp===name));
+  document.querySelectorAll("[data-panel]").forEach(pn=>pn.classList.toggle("hidden", pn.dataset.panel!==name));
+}
+function renderInspector() {
+  const ij=$("#inspectorJacket");
+  if (ij) {
+    const j=byId(jackets,selectedJacketId);
+    ij.className = j ? "item" : "empty";
+    ij.innerHTML = j ? `<div class="item-head"><b>${esc(j.title)}</b><span class="pill gold">${esc(j.state)}</span></div><div class="muted">Budget cap ${j.budget_cap_credits} credits · ${esc(j.visibility)}${j.room_id?' · room anchored':' · no room anchor'}</div><p>${esc(j.brief||'No brief yet.')}</p>${j.acceptance_criteria?`<p><b>Acceptance:</b> ${esc(j.acceptance_criteria)}</p>`:''}<p class="muted">Funding stays locked until CP4 Verify &amp; Fund replaces the database reserve trigger with real passed checks.</p>` : 'Select a jacket in the left rail.';
+  }
+  const im=$("#inspectorMembers");
+  if (im) {
+    const names=roomMembers.map(m=>{
+      if (m.agent_id) { const a=byId(agents,m.agent_id); return `${esc(a?.display_name||'Agent')} <span class="pill">@${esc(a?.slug||'agent')}</span> · agent/${esc(m.role)}`; }
+      return `${m.profile_id===currentUser?.id?'You':esc(String(m.profile_id||'').slice(0,8))} · human/${esc(m.role)}`;
+    });
+    im.className = names.length ? "item" : "empty";
+    im.innerHTML = names.length ? names.join('<br>') : 'Select a room with members.';
+  }
+  renderMention();
+}
+function mentionAgent() {
+  const m=String($("#messageBody")?.value||"").match(/@([a-z0-9][a-z0-9-]*)/i);
+  if (!m) return null;
+  return agents.find(a=>a.slug===m[1].toLowerCase()) || null;
+}
+function renderMention() {
+  const el=$("#mentionTarget"); if (!el) return;
+  const raw=String($("#messageBody")?.value||"");
+  const m=raw.match(/@([a-z0-9][a-z0-9-]*)/i);
+  if (!m) { el.textContent="No @agent targeted. Unnamed messages stay human messages; dispatch is explicit."; return; }
+  const a=mentionAgent();
+  if (!a) { el.textContent=`@${m[1].toLowerCase()} does not match any registered agent slug in this console. Check the left rail.`; return; }
+  const inRoom=roomMembers.some(x=>x.agent_id===a.id);
+  el.textContent=`Target: @${a.slug} · ${a.display_name} · ${inRoom?'room member — dispatchable on the selected jacket':'NOT a room member yet — add it from the Agents list before dispatch.'}`;
+  const sel=$("#dispatchAgent"); if (sel) sel.value=a.id;
+}
+function applyShellSearch() {
+  const q=String($("#shellSearch")?.value||"").trim().toLowerCase();
+  ["#roomList","#agentList","#jacketList"].forEach(sel=>{
+    document.querySelectorAll(`${sel} .selectable, ${sel} .item`).forEach(el=>{
+      el.style.display = (!q || el.textContent.toLowerCase().includes(q)) ? "" : "none";
+    });
+  });
+}
+
 async function loadConsoles() {
   if (!currentUser) { $("#consoleList").innerHTML='<p class="muted">Sign in to load only the consoles your grants allow.</p>'; $("#workspaceShell").classList.add("hidden"); return; }
   const { data, error } = await supabase.from("consoles").select("id,name,slug,status,created_at,owner_id").order("created_at",{ascending:true});
@@ -207,6 +300,7 @@ async function loadAgents() {
 }
 function renderAgents() {
   $("#agentList").innerHTML = agents.length ? agents.map(a=>`<div class="item"><div class="item-head"><h4>${esc(a.display_name)}</h4><span class="pill ${a.status==='ready'?'green':a.status==='error'?'red':'gold'}">${esc(a.status)}</span></div><div class="muted">/${esc(a.slug)} · ${esc(a.kind)} · ${esc(a.brain_model||'brain not declared')}</div><p>${esc(a.specialty||'No specialty declared.')}</p><div class="row">${(a.capabilities||[]).map(x=>`<span class="pill">${esc(x)}</span>`).join("")}</div><p class="muted">${a.endpoint_url?`Endpoint: ${esc(a.endpoint_url)}`:'No endpoint — dispatches will safely halt.'}<br>Last probe: ${a.last_probe_at?`${a.last_probe_ok?'pass':'fail'} · ${esc(a.last_probe_detail||'')}`:'never'}</p><div class="row"><button class="small secondary" data-probe-agent="${a.id}" type="button">Capability probe</button><button class="small secondary" data-add-agent-room="${a.id}" type="button">Add to selected room</button></div></div>`).join("") : '<div class="empty">No agents on this lot yet.</div>';
+  renderInspector(); applyShellSearch();
   document.querySelectorAll("[data-probe-agent]").forEach(b=>b.addEventListener("click",()=>probeAgent(b.dataset.probeAgent)));
   document.querySelectorAll("[data-add-agent-room]").forEach(b=>b.addEventListener("click",()=>addAgentToRoom(b.dataset.addAgentRoom)));
 }
@@ -243,6 +337,7 @@ async function loadRooms() {
 }
 function renderRooms() {
   $("#roomList").innerHTML = rooms.length ? rooms.map(r=>`<div class="selectable ${r.id===selectedRoomId?'active':''}" data-room="${r.id}"><div class="item-head"><b># ${esc(r.name)}</b><span class="pill">${esc(r.status)}</span></div><div class="muted">${esc(r.guidelines||'No guidelines yet.')}</div></div>`).join("") : '<div class="empty">No rooms yet.</div>';
+  applyShellSearch(); renderInspector();
   document.querySelectorAll("[data-room]").forEach(el=>el.addEventListener("click",async()=>{selectedRoomId=el.dataset.room;selectedThreadId="";localStorage.setItem("consoleai_room_id",selectedRoomId);renderRooms();await loadRoomContext();}));
 }
 async function addAgentToRoom(agentId) {
@@ -272,6 +367,7 @@ function renderRoomMembers() {
     return `${m.profile_id===currentUser.id?'You':esc(m.profile_id.slice(0,8))} · human/${esc(m.role)}`;
   });
   $("#roomMembers").innerHTML = `<b style="color:#fff">Members</b><br>${names.join('<br>')||'No members loaded.'}`;
+  renderInspector();
 }
 function renderThreads() {
   $("#threadSelect").innerHTML = threads.map(t=>`<option value="${t.id}" ${t.id===selectedThreadId?'selected':''}>${esc(t.title)} · ${esc(t.anchor_type)}</option>`).join('');
@@ -292,6 +388,7 @@ async function loadJackets() {
 }
 function renderJackets() {
   $("#jacketList").innerHTML = jackets.length ? jackets.map(j=>`<div class="selectable ${j.id===selectedJacketId?'active':''}" data-jacket="${j.id}"><div class="item-head"><b>${esc(j.title)}</b><span class="pill gold">${esc(j.state)}</span></div><div class="muted">Budget cap ${j.budget_cap_credits} credits · ${esc(j.visibility)}${j.room_id?' · room anchored':''}</div><div>${esc(excerpt(j.brief,180))}</div><div class="row" style="margin-top:8px"><label style="margin:0">State</label><select data-jacket-state="${j.id}">${['intake','desked','offered','approved','dispatched','evidence_open','verifying','safely_halted','on_hold','handled_error','errored','cancelled'].map(s=>`<option ${s===j.state?'selected':''}>${s}</option>`).join('')}</select></div></div>`).join("") : '<div class="empty">No job jackets yet.</div>';
+  renderInspector(); applyShellSearch();
   document.querySelectorAll("[data-jacket]").forEach(el=>el.addEventListener("click",async(e)=>{ if(e.target.tagName==='SELECT')return; selectedJacketId=el.dataset.jacket; localStorage.setItem("consoleai_jacket_id",selectedJacketId); renderJackets(); await loadDispatches(); }));
   document.querySelectorAll("[data-jacket-state]").forEach(sel=>sel.addEventListener("change",async()=>{ const {error}=await supabase.from("job_jackets").update({state:sel.value}).eq("id",sel.dataset.jacketState); if(error){say(error.message,'err');} else {await loadJackets();renderJackets();} }));
 }
@@ -437,6 +534,23 @@ $("#sendMessageBtn").addEventListener("click",async()=>{try{if(!selectedThreadId
 $("#createJacketBtn").addEventListener("click",async(ev)=>{const b=ev.currentTarget;b.disabled=true;try{await ensureProfile();const payload={console_id:selectedConsoleId,room_id:selectedRoomId||null,created_by:currentUser.id,title:$("#jacketTitle").value.trim(),brief:$("#jacketBrief").value.trim(),acceptance_criteria:$("#jacketAcceptance").value.trim(),budget_cap_credits:parseInt($("#jacketBudget").value||'0',10),visibility:$("#jacketVisibility").value,state:'intake'};if(!payload.title)throw new Error('Jacket needs a title.');const {data,error}=await supabase.from("job_jackets").insert(payload).select().single();if(error)throw error;selectedJacketId=data.id;await ensureJacketThread(data);await loadJackets();renderJackets();await loadDispatches();say(`Job jacket opened: ${payload.title}. It cannot enter funded until CP4 verification exists.`,'ok');}catch(e){say(e.message,'err');}finally{b.disabled=false;}});
 $("#dispatchBtn").addEventListener("click",async(ev)=>{const b=ev.currentTarget;b.disabled=true;try{await createDispatch({agentId:$("#dispatchAgent").value,instructions:$("#dispatchInstructions").value.trim()});}catch(e){say(e.message,'err');}finally{b.disabled=false;}});
 $("#refreshWorkBtn").addEventListener("click",async()=>{await loadRoomContext();await loadJackets();renderJackets();await loadDispatches();});
+
+document.querySelectorAll("[data-insp]").forEach(b=>b.addEventListener("click",()=>showInspector(b.dataset.insp)));
+$("#shellSearch")?.addEventListener("input",applyShellSearch);
+$("#messageBody")?.addEventListener("input",renderMention);
+$("#dispatchMentionBtn")?.addEventListener("click",async(ev)=>{
+  const b=ev.currentTarget; b.disabled=true;
+  try {
+    const a=mentionAgent();
+    const raw=String($("#messageBody").value||"").trim();
+    if (!a) throw new Error("Type @agent-slug in the composer first, using a registered agent slug.");
+    if (!raw) throw new Error("Write the work in the composer first.");
+    showInspector("runs");
+    await createDispatch({agentId:a.id, instructions:raw});
+    $("#messageBody").value=""; renderMention();
+  } catch(e) { say(e.message,'err'); }
+  finally { b.disabled=false; }
+});
 
 init();
 </script>
