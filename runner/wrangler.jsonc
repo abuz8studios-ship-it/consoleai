@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "consoleai-runner",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-16",
+  "triggers": { "crons": ["*/5 * * * *"] },
+  "vars": { "RUN_DUE_URL": "https://oasis.abuz8ai.com/api/run-due" }
+}

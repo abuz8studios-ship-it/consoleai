@@ -106,14 +106,41 @@ nothing copied from Kylon's branding, text, assets or source.
   hard-delete still needs child-first ordering. Supabase Auth redirect allowlist may
   need the online URLs added in the dashboard for magic links.
 
+## Real frontend + backend — DEPLOYED ONLINE (same evening, CHO: "build the real front end and back end")
+
+- Frontend split from the single file into `web/index.html` (25KB) + `web/styles.css`
+  + `web/app.js` (84KB) + `web/config.js`; served bytes hash-match the repo
+  (`app.js` sha256 `60b71a22...`). Signed-out render still reaches
+  "Backend reachable" on production and preview.
+- Backend: Cloudflare Pages Functions (`functions/`), config `wrangler.jsonc`
+  (`pages_build_output_dir=web`). Routes proven live on oasis + pages.dev +
+  immutable deployment URLs: `GET /api/health` 200 (secret flags all `false`),
+  `POST /api/dispatch` 401 without a session (server runner executes with the
+  caller's JWT under RLS; browser falls back only when the backend is absent),
+  `POST /api/agent-callback` and `POST /api/run-due` honest 503 until owner
+  secrets exist, `GET /app/:slug` honest 503 page until the service secret exists.
+- Cron runner Worker `consoleai-runner` deployed
+  (https://consoleai-runner.wireconn1.workers.dev, schedule `*/5 * * * *`),
+  inert until `CONSOLEAI_CRON_SECRET` is set on both sides.
+- Real file storage: migration `file_storage` — private `consoleai-files`
+  bucket (10MB) with per-console folder policies; UI uploads + signed downloads.
+- Operator map with exact secret/billing steps: `docs/BACKEND.md`. Secrets the
+  owner must paste (never via chat): `SUPABASE_SERVICE_ROLE_KEY`,
+  `CONSOLEAI_CALLBACK_SECRET`, `CONSOLEAI_CRON_SECRET`. No paid plan has been
+  purchased; Workers Paid starts $5/mo and Supabase Pro $25/mo base per vendor
+  pricing pages, both strictly CHO dashboard actions.
+- Still unproven: any signed-in dispatch through the server runner (needs the
+  first real user), callback/run-due/public-App happy paths (need the secrets),
+  Stripe, OAuth flows, market pricing/marketplace.
+
 ## Not built yet — do not claim
 
 - A connected real agent endpoint used from the browser (Hermes/Pegasus wiring is separate)
 - Signed-in end-user journey proof (schema/RLS/UI deployed; first real sign-in still owed)
 - Stripe funding/purchases (credit ledger is test-grant only today)
-- Background automation runner (schedule/webhook/record triggers are recorded definitions; Run-now dispatch is real)
+- Background automation *execution* until owner secrets are set (runner endpoints + cron Worker deployed; Run-now dispatch is real)
 - OAuth/one-click connections into external services (registry + grants only)
-- Public anonymous App pages and file-upload storage
+- Public anonymous App pages until the service secret is set (route deployed; file-upload storage is live)
 - Market book pricing / Cost-to-Market from real market comps (derived Books + metals from own rows are live)
 - Cross-console marketplace (CP8)
 - OasisAI beyond shared identity direction (CP9)

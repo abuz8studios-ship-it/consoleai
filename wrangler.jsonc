@@ -1,0 +1,6 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "consoleai-abuz8",
+  "pages_build_output_dir": "web",
+  "compatibility_date": "2026-10-16"
+}

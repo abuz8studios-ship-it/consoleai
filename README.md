@@ -31,8 +31,10 @@ assets, or source code; name, words, visuals, code and data here are ABUZ8's own
   Verify & Fund desk, approvals inbox, pooled test credit ledger, connection grants,
   automations (real Run-now; schedules recorded for a future runner), memories, file evidence.
 
-Still deliberately **not** wired: Stripe charging (test ledger only), background scheduler,
-OAuth connection flows, public anonymous App pages, upload storage, market pricing, marketplace.
+Still deliberately **not** wired: Stripe charging (test ledger only) and OAuth connection
+flows. The background scheduler, agent callback and public App pages are built and deployed
+but answer 503 until the owner sets their secrets (docs/BACKEND.md). Market pricing and
+marketplace remain open. File upload storage is live (private `consoleai-files` bucket).
 No silent OK gets paid: the database opens `funded` only when every required check passes
 and every required stip is satisfied.
 
@@ -58,9 +60,19 @@ jacket thread. Without an endpoint, dispatch records `safely_halted` — never a
 ## Run the front door
 
 ```bash
+# full stack (frontend + backend Functions) — recommended
+npx wrangler pages dev
+
+# static only (dispatch falls back to the in-browser runner)
 python -m http.server 8000 --directory web
 # http://127.0.0.1:8000
 ```
+
+Frontend: `web/index.html` + `web/styles.css` + `web/app.js`. Backend:
+Cloudflare Pages Functions in `functions/` (server dispatch runner, agent
+callback, automation runner endpoint, published App pages) plus the
+`runner/` cron Worker. Architecture, owner secrets and paid-hosting steps:
+[docs/BACKEND.md](docs/BACKEND.md). Live posture: `GET /api/health`.
 
 The page uses the project's **publishable** key in `web/config.js`. Publishable keys are safe
 in browsers only because Postgres RLS decides every row. Never put a secret/service-role key in web code.
