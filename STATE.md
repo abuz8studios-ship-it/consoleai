@@ -102,7 +102,7 @@ nothing copied from Kylon's branding, text, assets or source.
   no real agent endpoint has returned an App from the UI, Stripe charging is NOT wired
   (test ledger only), no background scheduler/webhook runner, no OAuth connection flows
   (registry + grants only), no public anonymous App pages, no file-upload storage,
-  no Books/metals (CP6), no marketplace (CP8), no mobile/desktop apps, console
+  derived Agent Books + metals live in the Platform tab (real rows only; market pricing open), no marketplace (CP8), no mobile/desktop apps, console
   hard-delete still needs child-first ordering. Supabase Auth redirect allowlist may
   need the online URLs added in the dashboard for magic links.
 
@@ -114,7 +114,7 @@ nothing copied from Kylon's branding, text, assets or source.
 - Background automation runner (schedule/webhook/record triggers are recorded definitions; Run-now dispatch is real)
 - OAuth/one-click connections into external services (registry + grants only)
 - Public anonymous App pages and file-upload storage
-- Agent book values/metals (CP6)
+- Market book pricing / Cost-to-Market from real market comps (derived Books + metals from own rows are live)
 - Cross-console marketplace (CP8)
 - OasisAI beyond shared identity direction (CP9)
 - Pegasus GPU command. At CP1 save time Pegasus was online on Tailscale with SSH

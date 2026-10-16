@@ -274,6 +274,9 @@ details.createbox{margin:10px 0}
           <label for="fileKind">Kind</label><select id="fileKind"><option value="evidence">Evidence</option><option value="output">Output</option><option value="attachment">Attachment</option><option value="other">Other</option></select>
           <div class="row" style="margin-top:8px"><button id="addFileBtn" class="secondary" type="button">Attach link</button></div>
           <div id="filesList"></div>
+          <h3>Agent Books (derived)</h3>
+          <p class="muted">Computed live from this console's real dispatches, funded jackets and credit charges — nothing estimated. Metals by funded outcomes: <b>Gold ≥ 10 · Silver ≥ 3 · Bronze ≥ 1</b>. Market pricing/Cost-to-Market needs real market data and is not invented here.</p>
+          <div id="booksList"><div class="empty">No dispatch history yet — books stay at zero until work runs.</div></div>
         </div>
       </aside>
     </div>
@@ -300,6 +303,7 @@ let selectedConsoleId = localStorage.getItem("consoleai_console_id") || "";
 let selectedRoomId = localStorage.getItem("consoleai_room_id") || "";
 let selectedThreadId = localStorage.getItem("consoleai_thread_id") || "";
 let selectedJacketId = localStorage.getItem("consoleai_jacket_id") || "";
+let allDispatches = [];
 let apps = [], appRecords = [], appLinks = [], appViews = [], stips = [], checks = [], approvals = [], credits = [], connections = [], connGrants = [], automations = [], memories = [], filesListData = [];
 let selectedAppId = localStorage.getItem("consoleai_app_id") || "";
 let appViewKind = localStorage.getItem("consoleai_app_view") || "table";
@@ -441,7 +445,8 @@ async function loadPlatform(){
   if (!byId(apps,selectedAppId)) selectedAppId = apps[0]?.id || "";
   localStorage.setItem("consoleai_app_id", selectedAppId);
   await loadVerify();
-  renderApps(); renderAppDetail(); renderApprovals(); renderCredits(); renderConnections(); renderAutomations(); renderMemories(); renderFiles();
+  try { allDispatches = jackets.length ? await q("dispatches", x=>x.in("jacket_id", jackets.map(j=>j.id)).order("created_at",{ascending:true})) : []; } catch(e){ allDispatches=[]; }
+  renderApps(); renderAppDetail(); renderApprovals(); renderCredits(); renderConnections(); renderAutomations(); renderMemories(); renderFiles(); renderBooks();
   if (selectedThreadId) { /* re-render app cards with fresh record counts */ try{ await loadMessages(); }catch{} }
 }
 const APP_TEMPLATES = {
@@ -584,6 +589,23 @@ async function chargeDispatch(dispatch){
   if (!est || est<=0 || !credits.length) return;
   const {data,error}=await supabase.from("credit_ledger").insert({console_id:selectedConsoleId,created_by:currentUser.id,jacket_id:dispatch.jacket_id,dispatch_id:dispatch.id,entry_kind:'dispatch_charge',credits:-est,note:'Completed dispatch charge (test ledger)',idempotency_key:`dispatch:${dispatch.id}`}).select().single();
   if (!error && data) credits.unshift(data);
+}
+
+function metalFor(funded){ return funded>=10 ? "Gold" : funded>=3 ? "Silver" : funded>=1 ? "Bronze" : "Unranked"; }
+function renderBooks(){
+  const el=$("#booksList"); if(!el) return;
+  if (!agents.length) { el.innerHTML='<div class="empty">No agents on this lot yet — books stay at zero until work runs.</div>'; return; }
+  const fundedJacketIds=new Set(jackets.filter(j=>j.state==='funded').map(j=>j.id));
+  const chargeByDispatch=new Map();
+  credits.filter(c=>c.entry_kind==='dispatch_charge' && c.dispatch_id).forEach(c=>chargeByDispatch.set(c.dispatch_id,(chargeByDispatch.get(c.dispatch_id)||0)+Math.abs(c.credits||0)));
+  el.innerHTML=agents.map(a=>{
+    const mine=allDispatches.filter(d=>d.agent_id===a.id);
+    const done=mine.filter(d=>d.status==='completed');
+    const funded=new Set(done.map(d=>d.jacket_id).filter(id=>fundedJacketIds.has(id))).size;
+    const charged=mine.reduce((sum,d)=>sum+(chargeByDispatch.get(d.id)||0),0);
+    const rate=mine.length?Math.round(100*done.length/mine.length):0;
+    return `<div class="item"><div class="item-head"><b>${esc(a.display_name)}</b><span class="pill ${funded>=3?'green':funded>=1?'gold':''}">${metalFor(funded)}</span></div><div class="muted">@${esc(a.slug)} · ${esc(a.status)}</div><div class="kv">Dispatches: <b>${mine.length}</b> · completed: <b>${done.length}</b> (${mine.length?rate+"%":"—"}) · funded jackets: <b>${funded}</b> · credits charged (test ledger): <b>${charged}</b></div></div>`;
+  }).join("");
 }
 function renderVerify(){
   const sum=$("#verifySummary"); if(!sum) return;

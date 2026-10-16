@@ -13,8 +13,8 @@ ConsoleAI learns the *functional anatomy* of a room-first company harness and fu
 with dealer-center machinery. It is **not** a copy of any company's branding, copy,
 assets, or source code; name, words, visuals, code and data here are ABUZ8's own.
 
-- **Online:** https://consoleai-abuz8.pages.dev — future door https://oasis.abuz8ai.com
-  (verify HTTPS fresh before calling the subdomain live).
+- **Online:** https://oasis.abuz8ai.com (LIVE — Pages domain active, HTTPS verified
+  2026-10-16) · mirror https://consoleai-abuz8.pages.dev
 - Supabase project: `consoleai` (`fetsmubjgyzsuwiubepj`, us-east-2) — https://fetsmubjgyzsuwiubepj.supabase.co
 - Migrations applied: `consoleai_foundation`, `rls_initplan`, `agents_rooms_jackets`, `fk_indexes`,
   `room_apps`, `verify_fund_platform`, `fk_indexes2`, `cascade_trigger_fix`
@@ -32,7 +32,7 @@ assets, or source code; name, words, visuals, code and data here are ABUZ8's own
   automations (real Run-now; schedules recorded for a future runner), memories, file evidence.
 
 Still deliberately **not** wired: Stripe charging (test ledger only), background scheduler,
-OAuth connection flows, public anonymous App pages, upload storage, Books/metals, marketplace.
+OAuth connection flows, public anonymous App pages, upload storage, market pricing, marketplace.
 No silent OK gets paid: the database opens `funded` only when every required check passes
 and every required stip is satisfied.
 
@@ -88,7 +88,7 @@ consoles (the rooftop / lot)
 - **CP4.5 — Room Apps:** live in DB + UI (records/views/links, inline cards, publish via approval).
 - **CP5 — Credits:** pooled append-only *test* ledger live (pause at zero, charge completed only).
   Stripe purchase + published rate card still open.
-- **CP6 — Books:** funded outcomes update agent metals and cost-to-market. *(open)*
+- **CP6 — Books (derived):** per-agent dispatches/completed/funded/charged + metals (Gold ≥10 funded, Silver ≥3, Bronze ≥1) computed live from real rows. Market comps/Cost-to-Market need real market data. *(market layer open)*
 - **CP7 — Connections/automations:** registry, grants, definitions, breaker and Run-now live.
   OAuth flows + background schedule/webhook runner still open.
 - **CP8 — Network:** cross-console offers; can-bid is separate from can-settle. *(open)*
