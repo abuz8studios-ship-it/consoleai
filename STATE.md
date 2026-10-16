@@ -134,8 +134,7 @@ nothing copied from Kylon's branding, text, assets or source.
 
 ## Supabase CLI lock-in — AMANECER CONTROLS THE PLATFORM (2026-10-16 night, CHO order)
 
-- Supabase CLI **v2.121.0** installed globally via npm (`AppData\Roaming
-pm\supabase`;
+- Supabase CLI **v2.121.0** installed globally via npm (user Roaming npm bin;
   winget has no Supabase package on this box). Owner supplied an access token and
   `supabase login --name amanecer-consoleai` returned **"You are now logged in."**
   Token values were never printed, committed, or stored anywhere except the CLI's
